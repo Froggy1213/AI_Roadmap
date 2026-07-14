@@ -38,6 +38,20 @@ def roadmap_stats(rid: int):
     return jsonify(stats_payload(db_session, get_roadmap_or_404(rid), date.today()))
 
 
+@api_bp.delete("/roadmaps/<int:rid>")
+def delete_roadmap(rid: int):
+    """Delete a roadmap and everything under it (modules, deps, resources,
+    sessions, runs, insights). SQLAlchemy's unit of work orders the
+    self-referential module deletes (split children before their parent)
+    from the mapped relationship, and ModuleDep rows go via ON DELETE CASCADE.
+    Any in-flight agent thread is harmless: its final commit is a no-op once
+    the rows are gone."""
+    rm = get_roadmap_or_404(rid)
+    db_session.delete(rm)
+    db_session.commit()
+    return jsonify({"ok": True, "deleted": rid})
+
+
 @api_bp.post("/roadmaps")
 def create_roadmap():
     """Accept a topic and spawn the 5-step agent in a background thread."""

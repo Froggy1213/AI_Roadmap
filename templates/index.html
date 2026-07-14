@@ -191,6 +191,29 @@ body { margin: 0; background: var(--color-bg); }
   background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
 .hp-stuck svg { width: 12px; height: 12px; }
 
+/* delete affordance on a roadmap card */
+.hp-del { flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; padding: 0; border: none; background: transparent;
+  color: var(--color-neutral-500); border-radius: var(--radius-sm); cursor: pointer;
+  opacity: 0; transition: opacity .15s, color .15s, background .15s; }
+.hp-route:hover .hp-del, .hp-del:focus-visible { opacity: 1; }
+.hp-del:hover { color: #ef9a9a; background: color-mix(in srgb, #ef5350 15%, transparent); }
+.hp-del svg { width: 15px; height: 15px; display: block; }
+@media (hover: none) { .hp-del { opacity: .55; } }
+
+/* danger button + confirmation modal */
+.btn-danger { color: #ef9a9a; border-color: color-mix(in srgb, #ef5350 50%, transparent); }
+.btn-danger:hover { background: color-mix(in srgb, #ef5350 15%, transparent); border-color: #ef5350; }
+.hp-modal-bg { position: fixed; inset: 0; z-index: 200; padding: 20px;
+  background: color-mix(in srgb, #000 55%, transparent); display: flex; align-items: center; justify-content: center; }
+.hp-modal { width: 100%; max-width: 400px; padding: 20px 22px;
+  background: var(--color-surface); border: 1px solid var(--color-neutral-700);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); }
+.hp-modal-h { font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 18px; line-height: 1.2; margin-bottom: 8px; }
+.hp-modal-s { font-size: 13px; color: var(--color-neutral-400); line-height: 1.5; margin-bottom: 18px; }
+.hp-modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
 /* ---- roadmap screen (from roadmap.css, Nocturne section) ------------- */
 .app-main-wide { width: 100%; max-width: 1760px; margin: 0 auto; padding: 0 28px; box-sizing: border-box; }
 .map-head { display: flex; align-items: flex-end; justify-content: space-between;
@@ -417,6 +440,7 @@ const ICONS = {
   play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5 19 12 8 19Z"/></svg>',
   arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>',
   lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h12v10H6z"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/><path d="M9 7V4h6v3"/></svg>',
 };
 
 /* ---- Home screen ------------------------------------------------------- */
@@ -440,7 +464,23 @@ const HomeScreen = {
     function openRoadmap(id) { NAV.roadmap(id); }
     function completeSession(sid) { api('/api/sessions/' + sid + '/complete', { method: 'POST', body: JSON.stringify({}) }).then(load); }
     function skipSession(sid) { api('/api/sessions/' + sid + '/skip', { method: 'POST' }).then(load); }
-    return { roadmaps, today, loading, topic, building, error, hasRoadmaps, startBuilding, openRoadmap, completeSession, skipSession, ICONS };
+
+    const pendingDelete = ref(null), busyDelete = ref(false);
+    function askDelete(rm) { pendingDelete.value = rm; }
+    function cancelDelete() { if (!busyDelete.value) pendingDelete.value = null; }
+    async function confirmDelete() {
+      if (!pendingDelete.value || busyDelete.value) return;
+      busyDelete.value = true;
+      try {
+        await api('/api/roadmaps/' + pendingDelete.value.id, { method: 'DELETE' });
+        pendingDelete.value = null;
+        await load();
+      } catch (e) { error.value = e.message; }
+      finally { busyDelete.value = false; }
+    }
+
+    return { roadmaps, today, loading, topic, building, error, hasRoadmaps, startBuilding, openRoadmap,
+             completeSession, skipSession, pendingDelete, busyDelete, askDelete, cancelDelete, confirmDelete, ICONS };
   },
   template: /*html*/`
   <div class="hp-page">
@@ -514,6 +554,8 @@ const HomeScreen = {
             <div class="hp-route-top">
               <span class="hp-route-dot" :style="{background: rm.color}"></span>
               <span class="hp-route-name">{{ rm.name }}</span>
+              <button class="hp-del" @click.stop="askDelete(rm)" @keyup.enter.stop="askDelete(rm)"
+                      :aria-label="'Delete ' + rm.name" title="Delete roadmap"><span v-html="ICONS.trash"></span></button>
             </div>
             <div>
               <div class="hp-route-count"><span>{{ rm.count_label }}</span><span>{{ rm.percent_label }}</span></div>
@@ -528,6 +570,18 @@ const HomeScreen = {
         </div>
       </section>
     </div></div>
+
+    <!-- Delete confirmation -->
+    <div v-if="pendingDelete" class="hp-modal-bg" @click.self="cancelDelete">
+      <div class="hp-modal" role="dialog" aria-modal="true">
+        <div class="hp-modal-h">Delete “{{ pendingDelete.name }}”?</div>
+        <div class="hp-modal-s">This permanently removes its modules, resources, sessions and history. This can't be undone.</div>
+        <div class="hp-modal-actions">
+          <button class="btn btn-ghost" @click="cancelDelete" :disabled="busyDelete">Cancel</button>
+          <button class="btn btn-danger" @click="confirmDelete" :disabled="busyDelete">{{ busyDelete ? 'Deleting …' : 'Delete roadmap' }}</button>
+        </div>
+      </div>
+    </div>
   </div>`
 };
 

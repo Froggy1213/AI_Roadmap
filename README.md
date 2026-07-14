@@ -103,6 +103,7 @@ POST /api/roadmaps               {topic, level, minutes_per_day, weekdays} → 2
 GET  /api/runs/<id>              → {status, steps[]}          # frontend polls every 700ms
 GET  /api/roadmaps               → cards: progress, streak, stuck flag
 GET  /api/roadmaps/<id>          → {roadmap, modules[] (state, code, x, y), edges[], counts}
+DELETE /api/roadmaps/<id>        → {ok, deleted}   # cascades: modules, deps, resources, sessions, runs, insights
 GET  /api/modules/<id>           → module + resources[] (with verified_at)
 GET  /api/today                  → today's sessions + all_done flag
 POST /api/sessions/<id>/complete {actual_minutes, note?}
