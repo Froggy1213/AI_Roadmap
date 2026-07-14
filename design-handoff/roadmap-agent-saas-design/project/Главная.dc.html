@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="stylesheet" href="assets/themes.scoped.css">
+<link rel="stylesheet" href="assets/home.css">
+<style>
+  body{margin:0;background:#161826;font-family:"Inter",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+</style>
+</helmet>
+
+<div class="theme-nocturne hp-page">
+  <div class="hp-switch" role="group" aria-label="Состояние макета">
+    <span class="hp-switch-lb">макет</span>
+    <div class="hp-switch-seg">
+      <button class="hp-sw {{emptyOn}}" onClick="{{setEmpty}}">Пустой</button>
+      <button class="hp-sw {{workOn}}" onClick="{{setWork}}">Рабочий</button>
+      <button class="hp-sw {{doneOn}}" onClick="{{setDone}}">Всё закрыто</button>
+    </div>
+  </div>
+
+  <sc-if value="{{isEmpty}}" hint-placeholder-val="{{true}}">
+    <header class="hp-header"><div class="hp-main hp-navrow">
+      <span class="hp-brand"><svg class="hp-mark" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="19" r="2.3"></circle><circle cx="19" cy="5" r="2.3"></circle><path d="M6.7 17.3 17.3 6.7"></path></svg>Маршрут</span>
+    </div></header>
+    <div class="hp-empty"><div class="hp-empty-col">
+      <h1>Что учишь?</h1>
+      <div class="hp-inrow">
+        <input class="hp-bigin" placeholder="арабский с нуля" value="{{query}}" onInput="{{onInput}}" aria-label="Что учишь?">
+        <button class="btn btn-primary hp-go">Собрать маршрут</button>
+      </div>
+      <div class="hp-chips">
+        <sc-for list="{{chips}}" as="c" hint-placeholder-count="4">
+          <button class="hp-chip" onClick="{{c.onClick}}">{{c.label}}</button>
+        </sc-for>
+      </div>
+      <div class="hp-how">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 7.6h.01"></path></svg>
+        <span>Агент разбивает тему на модули, находит под каждый реальные ресурсы и проверяет, что ссылки живые.</span>
+      </div>
+    </div></div>
+  </sc-if>
+
+  <sc-if value="{{showWork}}" hint-placeholder-val="{{false}}">
+    <header class="hp-header"><div class="hp-main hp-navrow">
+      <span class="hp-brand"><svg class="hp-mark" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="19" r="2.3"></circle><circle cx="19" cy="5" r="2.3"></circle><path d="M6.7 17.3 17.3 6.7"></path></svg>Маршрут</span>
+      <div class="hp-miniprompt">
+        <input class="hp-mini-in" placeholder="Новый маршрут…" aria-label="Собрать новый маршрут">
+      </div>
+      <div class="hp-avatar" aria-hidden="true">М</div>
+    </div></header>
+
+    <div class="hp-work"><div class="hp-main">
+      <section class="hp-block">
+        <div class="hp-sechead"><h2>Сегодня</h2><span class="hp-sechead-sub">{{todaySub}}</span></div>
+
+        <sc-if value="{{isWork}}" hint-placeholder-val="{{true}}">
+          <div class="hp-today">
+            <sc-for list="{{tasks}}" as="t" hint-placeholder-count="3">
+              <div class="hp-task">
+                <span class="hp-line" style="background:{{t.color}}"></span>
+                <div class="hp-task-main">
+                  <div class="hp-task-code"><span>{{t.code}}</span><span class="hp-task-route">{{t.route}}</span></div>
+                  <div class="hp-task-title">{{t.title}}</div>
+                </div>
+                <span class="hp-time">{{t.time}}</span>
+                <div class="hp-task-actions">
+                  <button class="btn btn-primary">Начать</button>
+                  <button class="btn btn-ghost">Отложить</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isDone}}" hint-placeholder-val="{{false}}">
+          <div class="hp-done">
+            <span class="hp-done-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>
+            <div class="hp-done-b">
+              <div class="hp-done-t">На сегодня всё. Следующий шаг завтра</div>
+              <div class="hp-done-s">Три задачи из дневного плана закрыты. Можно остановиться или заглянуть вперёд.</div>
+            </div>
+            <button class="btn btn-primary">Взять модуль вперёд</button>
+          </div>
+        </sc-if>
+      </section>
+
+      <section class="hp-block">
+        <div class="hp-sechead"><h2>Мои маршруты</h2><span class="hp-sechead-sub">2 активных</span></div>
+        <div class="hp-routes">
+          <sc-for list="{{routes}}" as="r" hint-placeholder-count="2">
+            <div class="hp-route">
+              <div class="hp-route-top">
+                <span class="hp-route-dot" style="background:{{r.color}}"></span>
+                <span class="hp-route-name">{{r.name}}</span>
+              </div>
+              <div>
+                <div class="hp-route-count"><span>{{r.count}}</span><span>{{r.pctLabel}}</span></div>
+                <div class="hp-bar" style="margin-top:8px"><span class="hp-bar-fill" style="width:{{r.pct}}%;background:{{r.color}}"></span></div>
+              </div>
+              <sc-if value="{{r.stuck}}" hint-placeholder-val="{{false}}">
+                <span class="hp-stuck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 22 20H2Z"></path><path d="M12 10v4"></path><path d="M12 17.3h.01"></path></svg>{{r.stuckText}}</span>
+              </sc-if>
+              <div class="hp-route-foot">
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20v-5"></path><path d="M10 20V9"></path><path d="M16 20V4"></path></svg>{{r.streak}}</span>
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l3 2"></path></svg>{{r.last}}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </div></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { mode: 'empty', query: '' };
+
+  renderVals() {
+    const self = this;
+    const mode = this.state.mode;
+    const set = (m) => () => self.setState({ mode: m });
+    const routesRaw = [
+      { name: 'Арабский с нуля', color: '#9184d9', done: 4, total: 14, streak: '7 дней подряд', last: 'последнее занятие вчера', stuck: false },
+      { name: 'Go для бэкенда', color: '#5bb6a4', done: 6, total: 20, streak: 'занятия по будням', last: 'последнее занятие 6 дней назад', stuck: true, stuckText: 'застряли на модуле 6 дней' }
+    ];
+    const routes = routesRaw.map(r => {
+      const pct = Math.round((r.done / r.total) * 100);
+      return Object.assign({}, r, { pct: pct, pctLabel: pct + '%', count: r.done + ' из ' + r.total + ' модулей' });
+    });
+    const tasks = [
+      { color: '#9184d9', code: 'ГР-03', route: 'Арабский с нуля', title: 'Род и число существительных', time: '45 мин' },
+      { color: '#5bb6a4', code: 'GO-07', route: 'Go для бэкенда', title: 'Горутины и каналы: основы', time: '30 мин' },
+      { color: '#9184d9', code: 'ЛЕ-05', route: 'Арабский с нуля', title: 'Аудирование: числа 1–20', time: '15 мин' }
+    ];
+    const chipLabels = ['Go для бэкенда', 'Арабский с нуля', 'Шитьё: базовый гардероб', 'Основы фотографии'];
+    const chips = chipLabels.map(l => ({ label: l, onClick: () => self.setState({ query: l }) }));
+
+    return {
+      isEmpty: mode === 'empty',
+      showWork: mode !== 'empty',
+      isWork: mode === 'work',
+      isDone: mode === 'done',
+      emptyOn: mode === 'empty' ? 'hp-sw-on' : '',
+      workOn: mode === 'work' ? 'hp-sw-on' : '',
+      doneOn: mode === 'done' ? 'hp-sw-on' : '',
+      setEmpty: set('empty'),
+      setWork: set('work'),
+      setDone: set('done'),
+      query: this.state.query,
+      onInput: (e) => self.setState({ query: e.target.value }),
+      todaySub: mode === 'done' ? 'план на сегодня закрыт' : '3 задачи · около 1,5 часа',
+      chips: chips,
+      tasks: tasks,
+      routes: routes
+    };
+  }
+}
+</script>
+</body>
+</html>

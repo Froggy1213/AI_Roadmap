@@ -1,0 +1,112 @@
+/* Roadmap Agent — Home page layout. Consumes the Nocturne design system:
+   all color/type/radius/space come from var(--*) resolved under .theme-nocturne.
+   This file only carries layout + responsive rules + motion prefs. */
+
+.hp-page{min-height:100vh;display:flex;flex-direction:column;background:var(--color-bg);color:var(--color-text);padding-top:60px}
+.hp-main{width:100%;max-width:900px;margin:0 auto;padding:0 28px;box-sizing:border-box}
+
+/* dev-only layout switcher */
+.hp-switch{position:fixed;top:16px;bottom:auto;left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:9px;padding:5px 5px 5px 12px;background:color-mix(in srgb,var(--color-surface) 88%,transparent);backdrop-filter:blur(8px);border:1px solid var(--color-neutral-800);border-radius:999px;box-shadow:var(--shadow-md)}
+.hp-switch-lb{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--color-neutral-500)}
+.hp-switch-seg{display:flex;gap:3px}
+.hp-sw{appearance:none;cursor:pointer;font-family:var(--font-body);font-size:12px;color:var(--color-neutral-300);background:transparent;border:none;padding:6px 12px;border-radius:999px;transition:background .18s,color .18s}
+.hp-sw:hover{color:var(--color-text)}
+.hp-sw-on{background:color-mix(in srgb,var(--color-accent) 22%,transparent);color:var(--color-accent-100);box-shadow:inset 0 0 0 1px var(--color-accent)}
+
+/* ── shared header ── */
+.hp-brand{display:flex;align-items:center;gap:9px;margin-right:auto;font-family:var(--font-heading);font-weight:600;font-size:17px;letter-spacing:-.01em}
+.hp-mark{width:22px;height:22px;flex:none;display:block}
+.hp-header{border-bottom:1px solid var(--color-neutral-800)}
+.hp-navrow{display:flex;align-items:center;gap:16px;min-height:62px}
+
+/* ── EMPTY STATE ── */
+.hp-empty{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:64px 28px 88px;min-height:72vh}
+.hp-empty-col{width:100%;max-width:600px}
+.hp-empty h1{font-size:42px;font-weight:500;line-height:1.05;letter-spacing:-.02em;margin:0 0 22px}
+.hp-inrow{display:flex;gap:10px;align-items:stretch}
+.hp-bigin{flex:1;min-height:56px;font-size:17px;padding:10px 16px;background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-neutral-700);border-radius:var(--radius-lg);caret-color:var(--color-accent);transition:border-color .18s,box-shadow .18s}
+.hp-bigin::placeholder{color:var(--color-neutral-500)}
+.hp-bigin:hover{border-color:var(--color-neutral-600)}
+.hp-bigin:focus{outline:none;border-color:var(--color-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-accent) 26%,transparent)}
+.hp-go{flex:none;min-height:56px;padding:0 22px;font-size:15px;border-radius:var(--radius-lg)}
+.hp-chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.hp-chip{appearance:none;cursor:pointer;font-family:var(--font-body);font-size:13px;color:var(--color-neutral-300);background:transparent;border:1px solid var(--color-neutral-700);padding:8px 14px;border-radius:999px;transition:border-color .16s,color .16s,background .16s}
+.hp-chip:hover{color:var(--color-accent-100);border-color:var(--color-accent);background:color-mix(in srgb,var(--color-accent) 12%,transparent)}
+.hp-how{display:flex;align-items:flex-start;gap:9px;margin-top:26px;font-size:12.5px;line-height:1.55;color:var(--color-neutral-500);max-width:540px}
+.hp-how svg{width:15px;height:15px;flex:none;margin-top:2px;color:var(--color-neutral-600)}
+
+/* ── WORKING STATE ── */
+.hp-work{flex:1;padding:34px 0 96px}
+.hp-miniprompt{display:flex;align-items:center;gap:8px;flex:none;width:min(320px,42vw);max-width:340px}
+.hp-mini-in{flex:1;min-height:38px;font-size:13.5px;padding:6px 12px;background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-neutral-800);border-radius:999px;caret-color:var(--color-accent)}
+.hp-mini-in::placeholder{color:var(--color-neutral-500)}
+.hp-mini-in:hover{border-color:var(--color-neutral-700)}
+.hp-mini-in:focus{outline:none;border-color:var(--color-accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-accent) 22%,transparent)}
+.hp-avatar{flex:none;width:32px;height:32px;border-radius:50%;background:color-mix(in srgb,var(--color-accent) 30%,var(--color-surface));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--color-accent-100);border:1px solid var(--color-neutral-800)}
+
+.hp-sechead{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 15px}
+.hp-sechead h2{font-size:24px;font-weight:500;letter-spacing:-.015em;margin:0}
+.hp-sechead-sub{font-size:12.5px;color:var(--color-neutral-500)}
+.hp-block + .hp-block{margin-top:44px}
+
+/* today list */
+.hp-today{display:flex;flex-direction:column;gap:11px}
+.hp-task{display:flex;align-items:center;gap:15px;padding:16px 18px;background:var(--color-surface);border:1px solid var(--color-neutral-800);border-radius:var(--radius-lg);transition:border-color .18s,transform .18s}
+.hp-task:hover{border-color:var(--color-neutral-700);transform:translateY(-1px)}
+.hp-line{width:4px;align-self:stretch;min-height:42px;border-radius:4px;flex:none}
+.hp-task-main{flex:1;min-width:0}
+.hp-task-code{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-size:11px;letter-spacing:.05em;color:var(--color-neutral-400);margin-bottom:3px;display:flex;gap:8px;align-items:center}
+.hp-task-route{color:var(--color-neutral-500)}
+.hp-task-title{font-size:15.5px;line-height:1.25}
+.hp-time{font-size:13px;color:var(--color-neutral-400);white-space:nowrap;flex:none}
+.hp-task-actions{display:flex;gap:8px;flex:none}
+
+/* all-done card */
+.hp-done{display:flex;align-items:center;gap:18px;padding:24px 22px;background:var(--color-surface);border:1px dashed var(--color-neutral-700);border-radius:var(--radius-lg)}
+.hp-done-ico{flex:none;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--color-accent) 16%,transparent);color:var(--color-accent)}
+.hp-done-ico svg{width:20px;height:20px}
+.hp-done-b{flex:1}
+.hp-done-t{font-size:16px;margin-bottom:2px}
+.hp-done-s{font-size:12.5px;color:var(--color-neutral-500)}
+
+/* routes */
+.hp-routes{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.hp-route{display:flex;flex-direction:column;gap:12px;padding:18px 19px;background:var(--color-surface);border:1px solid var(--color-neutral-800);border-radius:var(--radius-lg);transition:border-color .18s,transform .18s}
+.hp-route:hover{border-color:var(--color-neutral-700);transform:translateY(-1px)}
+.hp-route-top{display:flex;align-items:center;gap:10px}
+.hp-route-dot{width:11px;height:11px;border-radius:50%;flex:none}
+.hp-route-name{font-family:var(--font-heading);font-weight:600;font-size:16.5px;letter-spacing:-.01em;flex:1;min-width:0}
+.hp-route-count{font-size:12.5px;color:var(--color-neutral-400);display:flex;justify-content:space-between}
+.hp-bar{height:6px;border-radius:999px;background:var(--color-neutral-800);overflow:hidden}
+.hp-bar-fill{height:100%;border-radius:999px;transition:width .5s ease}
+.hp-route-foot{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--color-neutral-500)}
+.hp-route-foot span{display:inline-flex;align-items:center;gap:5px}
+.hp-route-foot svg{width:13px;height:13px;color:var(--color-neutral-600)}
+.hp-stuck{align-self:flex-start;display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:3px 9px;border-radius:999px;color:var(--color-accent-100);border:1px dashed var(--color-accent-400);background:color-mix(in srgb,var(--color-accent) 12%,transparent)}
+.hp-stuck svg{width:12px;height:12px}
+
+/* ── responsive ── */
+@media (max-width:720px){
+  .hp-main{padding:0 18px}
+  .hp-empty{padding:48px 18px 72px;min-height:70vh}
+  .hp-empty h1{font-size:32px}
+  .hp-inrow{flex-direction:column}
+  .hp-go{width:100%}
+  .hp-routes{grid-template-columns:1fr}
+  .hp-sechead h2{font-size:21px}
+  .hp-miniprompt{display:none}
+  .hp-task{flex-wrap:wrap}
+  .hp-task-actions{width:100%;padding-left:19px}
+  .hp-task-actions .btn{flex:1}
+  .hp-time{order:3}
+}
+@media (max-width:420px){
+  .hp-empty h1{font-size:27px}
+  .hp-switch-lb{display:none}
+}
+
+/* ── motion prefs ── */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none !important;animation:none !important}
+  .hp-bar-fill{transition:none !important}
+}

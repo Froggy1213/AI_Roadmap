@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="en" class="theme-nocturne">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Roadmap Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* ===== Nocturne design system (from themes.scoped.css) ================= */
+.theme-nocturne {
+  --color-bg: #161826;
+  --color-surface: #232532;
+  --color-text: #e9e9ed;
+  --color-accent: #9184d9;
+  --color-accent-2: #a7a1db;
+  --color-divider: color-mix(in srgb, #e9e9ed 16%, transparent);
+
+  --color-neutral-100: #f3f5fe;
+  --color-neutral-200: #e4e7f5;
+  --color-neutral-300: #cfd3e5;
+  --color-neutral-400: #b2b6ca;
+  --color-neutral-500: #9397ab;
+  --color-neutral-600: #75798c;
+  --color-neutral-700: #595d6c;
+  --color-neutral-800: #3f424d;
+  --color-neutral-900: #292b31;
+
+  --color-accent-100: #f5f4ff;
+  --color-accent-200: #e7e5fe;
+  --color-accent-300: #d2cefd;
+  --color-accent-400: #b5abfc;
+  --color-accent-500: #968ae0;
+  --color-accent-600: #796cbf;
+  --color-accent-700: #5d5294;
+  --color-accent-800: #423a6a;
+  --color-accent-900: #2b2741;
+
+  --color-accent-2-100: #f5f4ff;
+  --color-accent-2-200: #e7e5fe;
+  --color-accent-2-300: #d2cefd;
+  --color-accent-2-400: #b5afe8;
+  --color-accent-2-500: #9690c9;
+  --color-accent-2-600: #7972a9;
+  --color-accent-2-700: #5c5783;
+  --color-accent-2-800: #423e5d;
+  --color-accent-2-900: #2b293a;
+
+  --font-heading: "Inter", system-ui, sans-serif;
+  --font-heading-weight: 500;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  --space-1: 2.8px;
+  --space-2: 5.6px;
+  --space-3: 8.4px;
+  --space-4: 11.2px;
+  --space-6: 16.8px;
+  --space-8: 22.4px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+
+  --shadow-sm: 0 0 0 1px #3f424d;
+  --shadow-md: 0 0 0 1px #595d6c, 0 6px 18px rgba(0,0,0,0.55);
+  --shadow-lg: 0 0 0 1px #9397ab, 0 16px 40px rgba(0,0,0,0.65);
+}
+
+/* ---- global resets (Nocturne) ---------------------------------------- */
+.theme-nocturne *, .theme-nocturne *::before, .theme-nocturne *::after { box-sizing: border-box; }
+.theme-nocturne { background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); margin: 0; font-size: 15px; line-height: 1.55; font-weight: 400; }
+.theme-nocturne h1,.theme-nocturne h2,.theme-nocturne h3,.theme-nocturne h4 { font-family: var(--font-heading); font-weight: var(--font-heading-weight); line-height: 1.12; letter-spacing: -0.015em; margin: 0 0 var(--space-2); }
+.theme-nocturne h1 { font-size: 42px; }
+.theme-nocturne h2 { font-size: 32px; }
+.theme-nocturne h3 { font-size: 25px; }
+.theme-nocturne h4 { font-size: 20px; }
+.theme-nocturne h6 { font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; }
+.theme-nocturne a { color: var(--color-accent-300); text-underline-offset: 3px; }
+.theme-nocturne a:hover { color: var(--color-accent-100); }
+.theme-nocturne :focus { outline: none; }
+.theme-nocturne :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.theme-nocturne ::selection { background: color-mix(in srgb, var(--color-accent) 30%, transparent); }
+body { margin: 0; background: var(--color-bg); }
+
+/* ---- buttons (Nocturne) ----------------------------------------------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  cursor: pointer; text-decoration: none; font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight); font-size: 13px; line-height: 1.2;
+  color: var(--color-text); background: transparent; border: 1px solid transparent;
+  padding: calc(var(--space-2) * 0.85) var(--space-3); border-radius: var(--radius-md); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { color: var(--color-accent); border-color: var(--color-accent); }
+.btn-primary:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.btn-ghost { color: var(--color-accent); padding-inline: var(--space-1); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+
+/* ---- nav bar ---------------------------------------------------------- */
+.nav { display: flex; align-items: center; gap: var(--space-4);
+  padding: var(--space-3) var(--space-4); border-bottom: none; }
+.nav-brand { font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 18px; margin-right: auto; display: flex; align-items: center; gap: 9px; }
+.nav a { color: inherit; text-decoration: none; font-size: 14px; }
+.nav a:hover, .nav a[aria-current] { color: var(--color-accent); }
+
+/* ---- home page (from home.css) ---------------------------------------- */
+.hp-page { min-height: 100vh; display: flex; flex-direction: column; background: var(--color-bg); }
+.hp-header { border-bottom: 1px solid var(--color-neutral-800); }
+.hp-navrow { display: flex; align-items: center; gap: 16px; min-height: 62px; }
+.hp-brand { display: flex; align-items: center; gap: 9px; margin-right: auto;
+  font-family: var(--font-heading); font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
+.hp-mark { width: 22px; height: 22px; flex: none; display: block; }
+.hp-main { width: 100%; max-width: 900px; margin: 0 auto; padding: 0 28px; box-sizing: border-box; }
+
+.hp-empty { flex: 1; display: flex; flex-direction: column; justify-content: center;
+  align-items: center; padding: 64px 28px 88px; min-height: 72vh; }
+.hp-empty-col { width: 100%; max-width: 600px; }
+.hp-empty h1 { font-size: 42px; font-weight: 500; line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 22px; }
+.hp-inrow { display: flex; gap: 10px; align-items: stretch; }
+.hp-bigin { flex: 1; min-height: 56px; font-size: 17px; padding: 10px 16px;
+  background: var(--color-surface); color: var(--color-text);
+  border: 1px solid var(--color-neutral-700); border-radius: var(--radius-lg);
+  caret-color: var(--color-accent); transition: border-color .18s, box-shadow .18s; }
+.hp-bigin::placeholder { color: var(--color-neutral-500); }
+.hp-bigin:hover { border-color: var(--color-neutral-600); }
+.hp-bigin:focus { outline: none; border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 26%, transparent); }
+.hp-go { flex: none; min-height: 56px; padding: 0 22px; font-size: 15px; border-radius: var(--radius-lg); }
+.hp-chips { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+.hp-chip { appearance: none; cursor: pointer; font-family: var(--font-body); font-size: 13px;
+  color: var(--color-neutral-300); background: transparent; border: 1px solid var(--color-neutral-700);
+  padding: 8px 14px; border-radius: 999px; transition: border-color .16s, color .16s, background .16s; }
+.hp-chip:hover { color: var(--color-accent-100); border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.hp-how { display: flex; align-items: flex-start; gap: 9px; margin-top: 26px;
+  font-size: 12.5px; line-height: 1.55; color: var(--color-neutral-500); max-width: 540px; }
+.hp-how svg { width: 15px; height: 15px; flex: none; margin-top: 2px; color: var(--color-neutral-600); }
+
+.hp-work { flex: 1; padding: 34px 0 96px; }
+.hp-sechead { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 0 0 15px; }
+.hp-sechead h2 { font-size: 24px; font-weight: 500; letter-spacing: -0.015em; margin: 0; }
+.hp-sechead-sub { font-size: 12.5px; color: var(--color-neutral-500); }
+.hp-block + .hp-block { margin-top: 44px; }
+
+.hp-today { display: flex; flex-direction: column; gap: 11px; }
+.hp-task { display: flex; align-items: center; gap: 15px; padding: 16px 18px;
+  background: var(--color-surface); border: 1px solid var(--color-neutral-800);
+  border-radius: var(--radius-lg); transition: border-color .18s, transform .18s; }
+.hp-task:hover { border-color: var(--color-neutral-700); transform: translateY(-1px); }
+.hp-line { width: 4px; align-self: stretch; min-height: 42px; border-radius: 4px; flex: none; }
+.hp-task-main { flex: 1; min-width: 0; }
+.hp-task-code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 11px;
+  letter-spacing: .05em; color: var(--color-neutral-400); margin-bottom: 3px;
+  display: flex; gap: 8px; align-items: center; }
+.hp-task-route { color: var(--color-neutral-500); }
+.hp-task-title { font-size: 15.5px; line-height: 1.25; }
+.hp-time { font-size: 13px; color: var(--color-neutral-400); white-space: nowrap; flex: none; }
+.hp-task-actions { display: flex; gap: 8px; flex: none; }
+
+.hp-done { display: flex; align-items: center; gap: 18px; padding: 24px 22px;
+  background: var(--color-surface); border: 1px dashed var(--color-neutral-700);
+  border-radius: var(--radius-lg); }
+.hp-done-ico { flex: none; width: 40px; height: 40px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent); color: var(--color-accent); }
+.hp-done-ico svg { width: 20px; height: 20px; }
+.hp-done-b { flex: 1; }
+.hp-done-t { font-size: 16px; margin-bottom: 2px; }
+.hp-done-s { font-size: 12.5px; color: var(--color-neutral-500); }
+
+.hp-routes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.hp-route { display: flex; flex-direction: column; gap: 12px; padding: 18px 19px;
+  background: var(--color-surface); border: 1px solid var(--color-neutral-800);
+  border-radius: var(--radius-lg); transition: border-color .18s, transform .18s; cursor: pointer; }
+.hp-route:hover { border-color: var(--color-neutral-700); transform: translateY(-1px); }
+.hp-route:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.hp-route-top { display: flex; align-items: center; gap: 10px; }
+.hp-route-dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.hp-route-name { font-family: var(--font-heading); font-weight: 600; font-size: 16.5px;
+  letter-spacing: -0.01em; flex: 1; min-width: 0; }
+.hp-route-count { font-size: 12.5px; color: var(--color-neutral-400);
+  display: flex; justify-content: space-between; }
+.hp-bar { height: 6px; border-radius: 999px; background: var(--color-neutral-800); overflow: hidden; }
+.hp-bar-fill { height: 100%; border-radius: 999px; transition: width .5s ease; }
+.hp-route-foot { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--color-neutral-500); }
+.hp-route-foot span { display: inline-flex; align-items: center; gap: 5px; }
+.hp-route-foot svg { width: 13px; height: 13px; color: var(--color-neutral-600); }
+.hp-stuck { align-self: flex-start; display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11.5px; padding: 3px 9px; border-radius: 999px; color: var(--color-accent-100);
+  border: 1px dashed var(--color-accent-400);
+  background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.hp-stuck svg { width: 12px; height: 12px; }
+
+/* ---- roadmap screen (from roadmap.css, Nocturne section) ------------- */
+.app-main-wide { width: 100%; max-width: 1760px; margin: 0 auto; padding: 0 28px; box-sizing: border-box; }
+.map-head { display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 20px; flex-wrap: wrap; margin: 30px 0 6px; }
+.map-head h2 { font-size: 26px; font-weight: 500; letter-spacing: -0.015em; margin: 0 0 4px; }
+.map-sub { font-size: 13px; color: var(--color-neutral-500); }
+.map-meta { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.map-stats { text-align: right; font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.6; }
+
+.rm-graphwrap { overflow-x: auto; overflow-y: hidden; padding-bottom: 6px;
+  scrollbar-width: thin; scrollbar-color: var(--color-neutral-700) transparent; }
+.rm-graph { position: relative; margin: 36px 0 0; }
+.rm-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 1; }
+
+/* node cards */
+.rm-node { position: absolute; width: 170px; min-height: 62px; padding: 11px 13px;
+  display: flex; flex-direction: column; gap: 3px; z-index: 2;
+  background: var(--color-surface); border: 1px solid var(--color-neutral-800);
+  border-radius: var(--radius-md); cursor: pointer; }
+.rm-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.rm-ic { flex: none; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; }
+.rm-ic svg { width: 17px; height: 17px; display: none; stroke-width: 1.75; }
+.rm-node[data-state="completed"] .ic-completed { display: block; }
+.rm-node[data-state="inprogress"] .ic-inprogress { display: block; }
+.rm-node[data-state="available"] .ic-available { display: block; }
+.rm-node[data-state="stuck"] .ic-stuck { display: block; }
+.rm-node[data-state="locked"] .ic-locked { display: block; }
+.rm-ar { font-size: 12px; opacity: .62; direction: rtl; line-height: 1; font-weight: 400; }
+.rm-lb { font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 14px; line-height: 1.16; letter-spacing: -0.01em; }
+.rm-mt { font-size: 10.5px; opacity: .6; line-height: 1.25; font-weight: 400; }
+
+/* node state overrides — Nocturne */
+.rm-node[data-state="completed"] { border-color: var(--color-neutral-800);
+  background: color-mix(in srgb, var(--color-surface) 60%, var(--color-bg)); }
+.rm-node[data-state="completed"] .rm-lb { opacity: .72; }
+.rm-node[data-state="completed"] .rm-ic { color: var(--color-accent-300); }
+.rm-node[data-state="available"] { border-color: var(--color-neutral-700); }
+.rm-node[data-state="inprogress"] { border: 1px solid var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent), 0 0 22px color-mix(in srgb, var(--color-accent) 42%, transparent); }
+.rm-node[data-state="inprogress"] .rm-ic { color: var(--color-accent); }
+.rm-node[data-state="stuck"] { border: 1px dashed var(--color-accent-400);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface)); }
+.rm-node[data-state="stuck"] .rm-ic { color: var(--color-accent-300); }
+.rm-node[data-state="locked"] { border: 1px dashed var(--color-neutral-800);
+  background: transparent; opacity: .5; }
+
+/* "You are here" pin */
+.rm-today { position: absolute; top: -28px; left: 0; display: none; align-items: center;
+  gap: 5px; padding: 3px 9px; font-size: 10px; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; white-space: nowrap; z-index: 4;
+  background: transparent; color: var(--color-accent); border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm); box-shadow: 0 0 16px color-mix(in srgb, var(--color-accent) 30%, transparent); }
+.rm-node[data-state="inprogress"] .rm-today { display: inline-flex; }
+.rm-today svg { width: 12px; height: 12px; display: block; }
+
+/* resource popover */
+.rm-pop { position: absolute; width: 306px; padding: 14px 15px 12px; z-index: 5;
+  background: var(--color-surface); border: 1px solid var(--color-neutral-700);
+  box-shadow: var(--shadow-md); border-radius: var(--radius-md); }
+.rm-pop-k { font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--color-accent-300); margin-bottom: 3px; }
+.rm-pop-h { font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 15px; line-height: 1.15; margin-bottom: 2px; }
+.rm-pop-s { font-size: 11px; opacity: .62; margin-bottom: 9px; }
+.rm-res { display: flex; align-items: flex-start; gap: 9px; padding: 7px 0; }
+.rm-res + .rm-res { border-top: 1px solid var(--color-divider); }
+.rm-res-ic { flex: none; width: 15px; height: 15px; margin-top: 1px; color: var(--color-neutral-400); }
+.rm-res-ic svg { width: 15px; height: 15px; display: block; stroke-width: 1.75; }
+.rm-res-b { flex: 1; min-width: 0; }
+.rm-res-t { font-size: 12px; line-height: 1.25; }
+.rm-res-m { font-size: 10px; opacity: .55; margin-top: 1px; }
+.rm-verif { display: inline-flex; align-items: center; gap: 3px; font-size: 9.5px;
+  font-weight: 600; color: var(--color-accent-300); }
+.rm-verif svg { width: 11px; height: 11px; }
+
+/* "Plan adapted" panel */
+.rm-split { position: absolute; width: 326px; padding: 14px 15px 13px; z-index: 5;
+  background: var(--color-surface); border: 1px solid var(--color-accent-800);
+  box-shadow: var(--shadow-md), 0 0 26px color-mix(in srgb, var(--color-accent) 16%, transparent);
+  border-radius: var(--radius-md); }
+.rm-split-k { display: inline-flex; align-items: center; gap: 5px; font-size: 9.5px;
+  letter-spacing: .12em; text-transform: uppercase; font-weight: 700;
+  color: var(--color-accent-300); margin-bottom: 6px; }
+.rm-split-k svg { width: 12px; height: 12px; }
+.rm-split-h { font-family: var(--font-heading); font-weight: var(--font-heading-weight);
+  font-size: 14px; line-height: 1.2; margin-bottom: 4px; }
+.rm-split-b { font-size: 11.5px; line-height: 1.4; opacity: .78; margin-bottom: 9px; }
+.rm-steps { display: flex; flex-direction: column; gap: 5px; }
+.rm-step { display: flex; align-items: center; gap: 9px; padding: 6px 9px; font-size: 11.5px;
+  border-radius: var(--radius-sm); background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.rm-step-n { flex: none; width: 16px; height: 16px; display: flex; align-items: center;
+  justify-content: center; font-size: 9.5px; font-weight: 700; border-radius: 50%;
+  background: var(--color-accent-800); color: var(--color-accent-100); }
+
+/* edge base */
+.rm-edge { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.rm-e-done { stroke: var(--color-neutral-400); stroke-width: 2.4; opacity: .9; }
+.rm-e-active { stroke: var(--color-accent); stroke-width: 2; opacity: .95; }
+.rm-e-stuck { stroke: var(--color-accent-400); stroke-width: 2.2; }
+.rm-e-locked { stroke: color-mix(in srgb, var(--color-text) 24%, transparent);
+  stroke-width: 1.8; stroke-dasharray: 3 7; }
+.rm-lead { fill: none; stroke-width: 1.4; stroke-dasharray: 2 5; opacity: .75; stroke-linecap: round; }
+.rm-lead-res, .rm-lead-split { stroke: var(--color-accent); }
+
+/* legend */
+.rm-legend { display: flex; gap: 22px; flex-wrap: wrap; align-items: center;
+  padding: 14px 26px 0; }
+.rm-leg { display: flex; align-items: center; gap: 8px; font-size: 11.5px; }
+.rm-sw { width: 18px; height: 18px; flex: none; border-radius: var(--radius-sm); position: relative; }
+.rm-sw[data-s="completed"] { background: color-mix(in srgb, var(--color-surface) 60%, var(--color-bg)); border: 1px solid var(--color-neutral-800); }
+.rm-sw[data-s="inprogress"] { border: 1px solid var(--color-accent); box-shadow: 0 0 10px color-mix(in srgb, var(--color-accent) 45%, transparent); }
+.rm-sw[data-s="available"] { border: 1px solid var(--color-neutral-700); background: var(--color-surface); }
+.rm-sw[data-s="stuck"] { border: 1px dashed var(--color-accent-400); background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface)); }
+.rm-sw[data-s="locked"] { border: 1px dashed var(--color-neutral-800); opacity: .6; }
+
+/* ---- stats screen ----------------------------------------------------- */
+.stats-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 32px; }
+.stats-card { display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: var(--space-4); border-radius: var(--radius-md); background: var(--color-surface); }
+.stats-card-num { font-size: 1.6rem; font-weight: 700; color: var(--color-accent); }
+.stats-card-lbl { font-size: .8rem; color: var(--color-neutral-500); }
+.heat-cell { width: 12px; height: 12px; border-radius: 2px; }
+
+/* ---- build screen ----------------------------------------------------- */
+.build-steps { display: flex; flex-direction: column; }
+.build-step { display: flex; align-items: center; gap: 12px; padding: 12px 0;
+  border-bottom: 1px solid var(--color-neutral-800); }
+.build-step-icon { width: 20px; text-align: center; font-weight: 700; }
+.build-step-icon.done { color: var(--color-accent-300); }
+.build-step-icon.running { color: var(--color-accent); }
+.build-step-icon.failed { color: var(--color-accent-400); }
+.build-step-icon.pending { color: var(--color-neutral-600); }
+
+/* ---- responsive ------------------------------------------------------- */
+@media (max-width: 720px) {
+  .hp-main, .app-main-wide { padding: 0 18px; }
+  /* header "new roadmap" prompt: drop to its own full-width row */
+  .hp-navrow { flex-wrap: wrap; row-gap: 10px; }
+  .hp-navrow form { margin-left: 0 !important; width: 100%; }
+  .hp-navrow form input { flex: 1; width: auto !important; }
+  .hp-empty { padding: 48px 18px 72px; min-height: 70vh; }
+  .hp-empty h1 { font-size: 32px; }
+  .hp-inrow { flex-direction: column; }
+  .hp-go { width: 100%; }
+  .hp-routes { grid-template-columns: 1fr; }
+  .hp-sechead h2 { font-size: 21px; }
+  .hp-task { flex-wrap: wrap; }
+  .hp-task-actions { width: 100%; padding-left: 19px; }
+  .hp-task-actions .btn { flex: 1; }
+  .hp-time { order: 3; }
+  .map-stats { text-align: left; }
+  .map-head h2 { font-size: 22px; }
+}
+@media (max-width: 420px) { .hp-empty h1 { font-size: 27px; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+  .hp-bar-fill { transition: none !important; }
+}
+</style>
+</head>
+<body class="theme-nocturne">
+
+<div id="app">
+  <component :is="screen" :params="params" :key="routeKey"></component>
+</div>
+
+<script type="importmap">
+{ "imports": { "vue": "/static/vendor/vue.esm-browser.prod.js" } }
+</script>
+
+<script type="module">
+import { createApp, ref, computed, onMounted, onUnmounted, reactive } from 'vue';
+
+/* ---- hash router ------------------------------------------------------ */
+function useRouter() {
+  const route = reactive({ screen: 'home', params: {} });
+  function parse() {
+    const h = location.hash.replace(/^#\/?/, '') || 'home';
+    const [screen, ...rest] = h.split('/');
+    const params = {};
+    if (rest.length === 1 && screen === 'build') params.runId = rest[0];
+    else if (rest.length === 1 && screen === 'roadmap') params.id = rest[0];
+    else if (rest.length === 1 && screen === 'stats') params.id = rest[0];
+    route.screen = screen; route.params = params;
+  }
+  window.addEventListener('hashchange', parse); parse();
+  function go(screen, params = {}) {
+    let h = '#/' + screen;
+    if (params.runId) h += '/' + params.runId;
+    if (params.id) h += '/' + params.id;
+    location.hash = h;
+  }
+  return { route, go };
+}
+
+/* ---- API helper -------------------------------------------------------- */
+async function api(path, opts = {}) {
+  const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, cache: 'no-store', ...opts });
+  if (!res.ok) { const body = await res.json().catch(() => ({})); throw new Error(body.error || 'HTTP ' + res.status); }
+  return res.json();
+}
+
+/* ---- navigation (hash-driven; every screen self-navigates) ------------- */
+const NAV = {
+  home:    ()  => { location.hash = '#/home'; },
+  build:   (r) => { location.hash = '#/build/' + r; },
+  roadmap: (id) => { location.hash = '#/roadmap/' + id; },
+  stats:   (id) => { location.hash = '#/stats/' + id; },
+};
+
+/* ---- SVG icons (inline, matching the design) --------------------------- */
+const ICONS = {
+  mark: '<svg viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="19" r="2.3"/><circle cx="19" cy="5" r="2.3"/><path d="M6.7 17.3 17.3 6.7"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+  chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20v-5"/><path d="M10 20V9"/><path d="M16 20V4"/></svg>',
+  clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>',
+  stuck: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 22 20H2Z"/><path d="M12 10v4"/><path d="M12 17.3h.01"/></svg>',
+  pin: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4H18L12 19Z"/></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h11a1 1 0 0 1 1 1v15H7a1 1 0 0 1-1-1Z"/><path d="M6 4a2 2 0 0 0-2 2v13"/><path d="M10 4v16"/></svg>',
+  refresh: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 0 1 13-5l2 2"/><path d="M20 5v4h-4"/><path d="M20 13a8 8 0 0 1-13 5l-2-2"/><path d="M4 19v-4h4"/></svg>',
+  speaker: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6 6 10H3v4h3l5 4Z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5 19 12 8 19Z"/></svg>',
+  arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>',
+  lock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h12v10H6z"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+};
+
+/* ---- Home screen ------------------------------------------------------- */
+const HomeScreen = {
+  props: ['params'], emits: ['navigate'],
+  setup() {
+    const roadmaps = ref([]), today = ref(null), loading = ref(true), topic = ref(''), building = ref(false), error = ref(null);
+    async function load() {
+      try { const [r, t] = await Promise.all([api('/api/roadmaps'), api('/api/today')]); roadmaps.value = r.roadmaps || []; today.value = t; } catch (e) {} finally { loading.value = false; }
+    }
+    onMounted(load);
+    const hasRoadmaps = computed(() => roadmaps.value.length > 0 && !loading.value);
+    async function startBuilding() {
+      const t = topic.value.trim(); if (!t || building.value) return;
+      building.value = true; error.value = null;
+      try {
+        const res = await api('/api/roadmaps', { method: 'POST', body: JSON.stringify({ topic: t, level: 'beginner', minutes_per_day: 30 }) });
+        NAV.build(res.run_id);
+      } catch (e) { error.value = e.message; building.value = false; }
+    }
+    function openRoadmap(id) { NAV.roadmap(id); }
+    function completeSession(sid) { api('/api/sessions/' + sid + '/complete', { method: 'POST', body: JSON.stringify({}) }).then(load); }
+    function skipSession(sid) { api('/api/sessions/' + sid + '/skip', { method: 'POST' }).then(load); }
+    return { roadmaps, today, loading, topic, building, error, hasRoadmaps, startBuilding, openRoadmap, completeSession, skipSession, ICONS };
+  },
+  template: /*html*/`
+  <div class="hp-page">
+    <header class="hp-header"><div class="hp-main hp-navrow">
+      <span class="hp-brand"><span class="hp-mark" v-html="ICONS.mark"></span>Roadmap Agent</span>
+      <form v-if="hasRoadmaps" @submit.prevent="startBuilding" style="display:flex;gap:8px;align-items:center;margin-left:auto">
+        <input v-model="topic" placeholder="Start a new roadmap …" aria-label="Start a new roadmap"
+               style="min-height:38px;font-size:13px;padding:8px 12px;background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-neutral-700);border-radius:var(--radius-md);width:220px;caret-color:var(--color-accent)" />
+        <button class="btn btn-primary" :disabled="!topic.trim() || building" type="submit">{{ building ? 'Building …' : 'Build' }}</button>
+      </form>
+    </div></header>
+
+    <!-- First visit -->
+    <div v-if="!hasRoadmaps" class="hp-empty"><div class="hp-empty-col">
+      <h1>What do you want to learn?</h1>
+      <div class="hp-inrow">
+        <input class="hp-bigin" v-model="topic" @keyup.enter="startBuilding"
+               placeholder="Arabic, from zero to conversation" aria-label="What do you want to learn?" autofocus />
+        <button class="btn btn-primary hp-go" @click="startBuilding" :disabled="!topic.trim() || building">{{ building ? 'Building …' : 'Build my roadmap' }}</button>
+      </div>
+      <div v-if="error" style="margin-top:12px;font-size:12.5px;color:var(--color-accent-300)">{{ error }}</div>
+      <div class="hp-chips">
+        <button class="hp-chip" @click="topic='Go for Backend'">Go for backend</button>
+        <button class="hp-chip" @click="topic='Learn Arabic'">Arabic from scratch</button>
+        <button class="hp-chip" @click="topic='Rust from Zero'">Rust from zero</button>
+        <button class="hp-chip" @click="topic='Machine Learning'">Machine Learning</button>
+      </div>
+      <div class="hp-how">
+        <span v-html="ICONS.info" style="width:15px;height:15px;flex:none;margin-top:2px;color:var(--color-neutral-600)"></span>
+        <span>The agent breaks your topic into a dependency graph of modules, finds real learning resources for each one, and verifies that every link is alive — then paces it to the time you actually have.</span>
+      </div>
+    </div></div>
+
+    <!-- Working state -->
+    <div v-if="hasRoadmaps" class="hp-work"><div class="hp-main">
+      <section class="hp-block">
+        <div class="hp-sechead"><h2>Today</h2>
+          <span class="hp-sechead-sub">{{ today && today.sessions ? today.sub_label : 'nothing scheduled' }}</span>
+        </div>
+
+        <div v-if="today && today.sessions && today.sessions.length && !today.all_done" class="hp-today">
+          <div v-for="s in today.sessions.filter(s => s.status !== 'done')" :key="s.id" class="hp-task">
+            <span class="hp-line" :style="{background: s.color || 'var(--color-accent)'}"></span>
+            <div class="hp-task-main">
+              <div class="hp-task-code"><span>{{ s.module_code }}</span><span class="hp-task-route">{{ s.roadmap_name }}</span></div>
+              <div class="hp-task-title">{{ s.label }}</div>
+            </div>
+            <span class="hp-time">{{ s.minutes }} min</span>
+            <div class="hp-task-actions">
+              <button class="btn btn-primary" @click="completeSession(s.id)">Start</button>
+              <button class="btn btn-ghost" @click="skipSession(s.id)">Push back</button>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="today && today.all_done" class="hp-done">
+          <span class="hp-done-ico" v-html="ICONS.check"></span>
+          <div class="hp-done-b">
+            <div class="hp-done-t">That's everything for today{{ today.next_session_label ? '. ' + today.next_session_label : '' }}</div>
+            <div class="hp-done-s">All sessions from today's plan are done. Stop here — the pace holds — or look one module ahead.</div>
+          </div>
+          <button class="btn btn-primary">Pull a module forward</button>
+        </div>
+      </section>
+
+      <section class="hp-block">
+        <div class="hp-sechead"><h2>My roadmaps</h2><span class="hp-sechead-sub">{{ roadmaps.length }} active</span></div>
+        <div class="hp-routes">
+          <div v-for="rm in roadmaps" :key="rm.id" class="hp-route" tabindex="0"
+               @click="openRoadmap(rm.id)" @keyup.enter="openRoadmap(rm.id)">
+            <div class="hp-route-top">
+              <span class="hp-route-dot" :style="{background: rm.color}"></span>
+              <span class="hp-route-name">{{ rm.name }}</span>
+            </div>
+            <div>
+              <div class="hp-route-count"><span>{{ rm.count_label }}</span><span>{{ rm.percent_label }}</span></div>
+              <div class="hp-bar" style="margin-top:8px"><span class="hp-bar-fill" :style="{width: rm.percent + '%', background: rm.color}"></span></div>
+            </div>
+            <span v-if="rm.stuck" class="hp-stuck"><span v-html="ICONS.stuck" style="width:12px;height:12px"></span>{{ rm.stuck_label }}</span>
+            <div class="hp-route-foot">
+              <span><span v-html="ICONS.chart"></span>{{ rm.pace_label }}</span>
+              <span><span v-html="ICONS.clock"></span>{{ rm.last_session_label }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div></div>
+  </div>`
+};
+
+/* ---- Build screen ------------------------------------------------------ */
+const BuildScreen = {
+  props: ['params'], emits: ['navigate'],
+  setup(props) {
+    const run = ref(null), roadmapId = ref(null), error = ref(null), topic = ref(props.params.topic || '');
+    let timer = null;
+
+    async function poll(runId) {
+      try {
+        const r = await api('/api/runs/' + runId);
+        run.value = r;
+        if (r.status === 'failed') { error.value = r.error || 'Could not build this roadmap — try narrowing the topic.'; clearInterval(timer); }
+        else if (r.status === 'done') { clearInterval(timer); roadmapId.value = r.roadmap_id; }
+      } catch (e) { error.value = e.message; clearInterval(timer); }
+    }
+
+    function watch(runId) { poll(runId); timer = setInterval(() => poll(runId), 700); }
+
+    async function start() {
+      if (!topic.value.trim()) return;
+      error.value = null; run.value = null;
+      try {
+        const res = await api('/api/roadmaps', { method: 'POST', body: JSON.stringify({ topic: topic.value.trim(), level: 'beginner', minutes_per_day: 30 }) });
+        location.hash = '#/build/' + res.run_id;  // watch() starts from onMounted after remount
+        watch(res.run_id);
+      } catch (e) { error.value = e.message; }
+    }
+
+    onMounted(() => {
+      if (props.params.runId) watch(props.params.runId);
+      else if (props.params.topic) start();
+    });
+    onUnmounted(() => { if (timer) clearInterval(timer); });
+
+    const heading = computed(() => run.value && run.value.kind === 'replan' ? 'Adapting your plan' : 'Building your roadmap');
+    function goRoadmap() { if (roadmapId.value) NAV.roadmap(roadmapId.value); }
+    const icons = { pending: '○', running: '◉', done: '✓', failed: '✕' };
+    return { run, roadmapId, error, topic, heading, start, goRoadmap, icons, ICONS };
+  },
+  template: /*html*/`
+  <div class="hp-page">
+    <header class="hp-header"><div class="hp-main hp-navrow">
+      <span class="hp-brand"><span class="hp-mark" v-html="ICONS.mark"></span>Roadmap Agent</span>
+    </div></header>
+    <div class="hp-main" style="margin-top:40px;max-width:680px">
+      <h2 style="font-size:22px;font-weight:500;margin-bottom:24px">{{ heading }}</h2>
+
+      <div v-if="!run && !error" style="display:flex;gap:10px;margin-bottom:24px">
+        <input class="hp-bigin" v-model="topic" @keyup.enter="start"
+               placeholder="What do you want to learn?" style="min-height:48px" autofocus />
+        <button class="btn btn-primary hp-go" @click="start" :disabled="!topic.trim()">Build</button>
+      </div>
+
+      <div v-if="error" style="padding:14px 16px;border:1px dashed var(--color-accent-400);border-radius:var(--radius-md);margin-bottom:16px;
+           background:color-mix(in srgb,var(--color-accent) 12%,var(--color-surface))">
+        <p style="color:var(--color-accent-300);margin-bottom:8px;font-size:13px">{{ error }}</p>
+        <div style="display:flex;gap:8px">
+          <input v-model="topic" placeholder="Try a narrower topic" class="hp-bigin" style="min-height:42px;font-size:14px" />
+          <button class="btn btn-primary" @click="error=null;start()">Retry</button>
+        </div>
+      </div>
+
+      <div v-if="run && run.steps" class="build-steps">
+        <div v-for="step in run.steps" :key="step.key" class="build-step">
+          <span class="build-step-icon" :class="step.status">{{ icons[step.status] || '○' }}</span>
+          <div style="flex:1">
+            <div style="font-weight:500;font-size:.9rem">{{ step.label }}</div>
+            <div v-if="step.detail" style="font-size:.8rem;color:var(--color-neutral-500)">{{ step.detail }}</div>
+          </div>
+          <span v-if="step.status === 'pending'" style="color:var(--color-neutral-500);font-size:.8rem">waiting</span>
+        </div>
+      </div>
+
+      <div v-if="run && run.status === 'done' && roadmapId" style="text-align:center;padding:20px">
+        <p style="color:var(--color-accent-300);margin-bottom:12px">Roadmap is ready</p>
+        <button class="btn btn-primary" @click="goRoadmap">Open roadmap</button>
+      </div>
+    </div>
+  </div>`
+};
+
+/* ---- Roadmap screen ---------------------------------------------------- */
+const RoadmapScreen = {
+  props: ['params'], emits: ['navigate'],
+  setup(props) {
+    const data = ref(null), selected = ref(null), loading = ref(true), inprog = ref(null), busy = ref(false);
+
+    async function load() {
+      try {
+        data.value = await api('/api/roadmaps/' + props.params.id);
+        const ip = (data.value.modules || []).find(m => m.state === 'inprogress');
+        inprog.value = ip ? await api('/api/modules/' + ip.id) : null;
+      } catch (e) {} finally { loading.value = false; }
+    }
+    onMounted(load);
+
+    // Grow the canvas so an anchored popover on a lower node is never clipped.
+    const graphHeight = computed(() => {
+      let h = (data.value && data.value.canvas && data.value.canvas.height) || 604;
+      if (inprog.value && data.value) {
+        const n = data.value.modules.find(m => m.id === inprog.value.id);
+        if (n) h = Math.max(h, n.y + 250);
+      }
+      return h;
+    });
+    function nodeOf(id) { return (data.value && data.value.modules.find(m => m.id === id)) || { x: 300, y: 288 }; }
+    function popStyle(ip) { const n = nodeOf(ip.id); return { left: Math.max(8, n.x - 124) + 'px', top: (n.y + 82) + 'px' }; }
+    function leadPath(ip) { const n = nodeOf(ip.id); const cx = n.x + 85; return 'M ' + cx + ' ' + (n.y + 62) + ' L ' + cx + ' ' + (n.y + 80); }
+
+    function selectModule(mid) { api('/api/modules/' + mid).then(m => { selected.value = m; }); }
+    function closeOverlay() { selected.value = null; }
+
+    function edgePath(e) {
+      const { x1, y1, x2, y2 } = e.points;
+      const dx = x2 - x1;
+      return 'M' + x1 + ' ' + y1 + ' C' + Math.round(x1 + dx * 0.5) + ' ' + y1 + ', ' + Math.round(x2 - dx * 0.5) + ' ' + y2 + ', ' + x2 + ' ' + y2;
+    }
+
+    function completeModuleSessions(mid) {
+      if (busy.value) return; busy.value = true;
+      api('/api/today').then(t => {
+        const todays = (t.sessions || []).filter(s => s.module_id === mid && s.status === 'planned');
+        Promise.all(todays.map(s => api('/api/sessions/' + s.id + '/complete', { method: 'POST', body: JSON.stringify({}) })))
+          .then(() => { selected.value = null; return load(); })
+          .finally(() => { busy.value = false; });
+      });
+    }
+    function markStuck(mid) {
+      if (busy.value) return; busy.value = true;
+      api('/api/modules/' + mid + '/stuck', { method: 'POST', body: JSON.stringify({ reason: "I'm stuck on this module." }) })
+        .then(r => { selected.value = null; if (r && r.run_id) NAV.build(r.run_id); })
+        .finally(() => { busy.value = false; });
+    }
+
+    function kindIcon(kind) {
+      const map = { video: ICONS.play, article: ICONS.book, course: ICONS.book, book: ICONS.book, audio: ICONS.speaker, practice: ICONS.refresh };
+      return map[kind] || ICONS.book;
+    }
+
+    const edgeClass = (s) => 'rm-edge rm-e-' + s;
+
+    return { data, selected, loading, inprog, busy, graphHeight, popStyle, leadPath,
+             selectModule, closeOverlay, edgePath, edgeClass,
+             completeModuleSessions, markStuck, kindIcon, ICONS };
+  },
+  template: /*html*/`
+  <div class="hp-page">
+    <header class="hp-header"><div class="hp-navrow" style="max-width:1760px;margin:0 auto;padding:0 28px">
+      <span class="hp-brand"><span class="hp-mark" v-html="ICONS.mark"></span>Roadmap Agent</span>
+      <a href="#/home">Home</a>
+      <template v-if="data">
+        <a :href="'#/roadmap/' + data.roadmap.id" style="color:var(--color-accent)">Roadmap</a>
+        <a :href="'#/stats/' + data.roadmap.id">Progress</a>
+      </template>
+    </div></header>
+
+    <div v-if="loading" style="text-align:center;padding:60px 0;color:var(--color-neutral-500)">Loading …</div>
+    <div v-else-if="data" class="app-main-wide">
+      <div class="map-head">
+        <div>
+          <h2>{{ data.roadmap.name }}</h2>
+          <div class="map-sub">{{ data.roadmap.subtitle }}</div>
+        </div>
+        <div class="map-meta">
+          <div class="map-stats">
+            <div v-for="hs in data.roadmap.header_stats" :key="hs">{{ hs }}</div>
+          </div>
+          <a href="#/home" class="btn btn-primary">Resume today's session</a>
+        </div>
+      </div>
+
+      <div class="rm-graphwrap">
+        <div class="rm-graph" :style="{width: ((data.canvas && data.canvas.width) || 1680) + 'px', height: graphHeight + 'px'}">
+          <svg class="rm-svg" :viewBox="'0 0 ' + ((data.canvas && data.canvas.width) || 1680) + ' ' + graphHeight" preserveAspectRatio="none" aria-hidden="true">
+            <path v-for="e in data.edges" :key="e.from + '-' + e.to"
+                  :class="edgeClass(e.style)" :d="edgePath(e)" />
+            <path v-if="inprog" class="rm-lead rm-lead-res" :d="leadPath(inprog)" />
+          </svg>
+
+          <div v-for="m in data.modules" :key="m.id" class="rm-node" :data-state="m.state"
+               :style="{left: m.x + 'px', top: m.y + 'px'}" @click="selectModule(m.id)">
+            <span class="rm-today"><span v-html="ICONS.pin"></span>You are here</span>
+            <div class="rm-top">
+              <span class="rm-lb">{{ m.title }}</span>
+              <span class="rm-ic">
+                <svg class="ic ic-completed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                <svg class="ic ic-inprogress" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5 19 12 8 19Z"/></svg>
+                <svg class="ic ic-available" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+                <svg class="ic ic-stuck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 22 20H2Z"/><path d="M12 10v4"/><path d="M12 17.3h.01"/></svg>
+                <svg class="ic ic-locked" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h12v10H6z"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              </span>
+            </div>
+            <span v-if="m.title_native" class="rm-ar">{{ m.title_native }}</span>
+            <span class="rm-mt">{{ m.meta_label }}</span>
+          </div>
+
+          <!-- In-progress resource popover (anchored under the active node) -->
+          <div v-if="inprog" class="rm-pop" :style="popStyle(inprog)">
+            <div class="rm-pop-k">In progress · today's target</div>
+            <div class="rm-pop-h">{{ inprog.title }}</div>
+            <div class="rm-pop-s">{{ (inprog.today_planned_minutes || inprog.est_minutes) }} min · {{ inprog.meta_label }} · {{ inprog.verified_label }}</div>
+            <div v-for="r in (inprog.resources || []).slice(0, 3)" :key="r.id" class="rm-res">
+              <span class="rm-res-ic" v-html="kindIcon(r.kind)"></span>
+              <span class="rm-res-b">
+                <a :href="r.url" target="_blank" rel="noopener" class="rm-res-t">{{ r.title }}</a>
+                <div class="rm-res-m">{{ r.kind_label }}<span v-if="r.duration_min"> · {{ r.duration_min }} min</span><span v-if="r.verified" class="rm-verif"> · <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Verified</span></div>
+              </span>
+            </div>
+            <div v-if="!inprog.resources || !inprog.resources.length" class="rm-res-m" style="padding:6px 0">Resources pending verification.</div>
+          </div>
+
+          <!-- Plan adapted panel -->
+          <div v-for="a in data.adaptations" :key="a.insight_id" class="rm-split"
+               :style="{left: ((data.modules.find(m=>m.id===a.module_id)?.x || 0) + 190) + 'px', top: ((data.modules.find(m=>m.id===a.module_id)?.y || 0) - 20) + 'px'}">
+            <div class="rm-split-k"><span v-html="ICONS.stuck"></span>Plan adapted</div>
+            <div class="rm-split-h">{{ a.title }}</div>
+            <div class="rm-split-b">{{ a.body }}</div>
+            <div v-if="a.steps" class="rm-steps">
+              <div v-for="(s, i) in a.steps" :key="i" class="rm-step"><span class="rm-step-n">{{ i + 1 }}</span>{{ s }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rm-legend">
+        <div class="rm-leg"><span class="rm-sw" data-s="completed"></span>Completed</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="inprogress"></span>In progress · today</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="available"></span>Available</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="stuck"></span>Stuck — replanned</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="locked"></span>Locked</div>
+      </div>
+    </div>
+
+    <!-- Module popover -->
+    <div v-if="selected" style="position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center"
+         @click.self="closeOverlay">
+      <div class="rm-pop" style="width:340px;max-height:80vh;overflow-y:auto;position:static;border-radius:var(--radius-lg)">
+        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:4px">
+          <div>
+            <div class="rm-pop-k">{{ selected.meta_label.split('·')[0]?.trim() || selected.state }}</div>
+            <div class="rm-pop-h">{{ selected.title }}</div>
+            <div class="rm-pop-s">{{ selected.est_minutes ? selected.est_minutes + ' min' : '' }} · {{ selected.meta_label }} · {{ selected.verified_label }}</div>
+          </div>
+          <button class="btn btn-ghost" @click="closeOverlay" style="padding:2px 6px;line-height:1">&times;</button>
+        </div>
+
+        <div v-if="selected.resources && selected.resources.length">
+          <div v-for="r in selected.resources" :key="r.id" class="rm-res">
+            <span class="rm-res-ic" v-html="kindIcon(r.kind)"></span>
+            <span class="rm-res-b">
+              <a :href="r.url" target="_blank" rel="noopener" class="rm-res-t">{{ r.title }}</a>
+              <div class="rm-res-m">
+                {{ r.kind_label }}<span v-if="r.duration_min"> · ~{{ r.duration_min }} min</span>
+                <span v-if="r.verified" class="rm-verif"> · <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Verified</span>
+              </div>
+            </span>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="btn btn-primary" @click="completeModuleSessions(selected.id)" :disabled="busy">Mark done</button>
+          <button v-if="selected.state !== 'stuck'" class="btn btn-ghost" @click="markStuck(selected.id)" :disabled="busy">I'm stuck</button>
+        </div>
+      </div>
+    </div>
+  </div>`
+};
+
+/* ---- Stats screen ------------------------------------------------------ */
+const StatsScreen = {
+  props: ['params'], emits: ['navigate'],
+  setup(props) {
+    const stats = ref(null), loading = ref(true), rid = ref(props.params.id);
+    async function load() { try { stats.value = await api('/api/roadmaps/' + props.params.id + '/stats'); } catch (e) {} finally { loading.value = false; } }
+    onMounted(load);
+
+    function applyInsight(iid) {
+      api('/api/insights/' + iid + '/apply', { method: 'POST' })
+        .then(r => { if (r && r.run_id) NAV.build(r.run_id); else load(); });
+    }
+    function heatColor(minutes, max) {
+      if (!minutes || max <= 0) return 'var(--color-neutral-900)';
+      const p = minutes / max;
+      if (p > 0.6) return 'var(--color-accent)';
+      if (p > 0.3) return 'var(--color-accent-800)';
+      return 'var(--color-neutral-800)';
+    }
+    return { stats, loading, rid, applyInsight, heatColor, ICONS };
+  },
+  template: /*html*/`
+  <div class="hp-page">
+    <header class="hp-header"><div class="hp-navrow" style="max-width:1760px;margin:0 auto;padding:0 28px">
+      <span class="hp-brand"><span class="hp-mark" v-html="ICONS.mark"></span>Roadmap Agent</span>
+      <a href="#/home">Home</a>
+      <a :href="'#/roadmap/' + rid">Roadmap</a>
+      <a :href="'#/stats/' + rid" style="color:var(--color-accent)">Progress</a>
+    </div></header>
+
+    <div v-if="loading" style="text-align:center;padding:40px 0;color:var(--color-neutral-500)">Loading …</div>
+    <div v-else-if="stats" class="hp-main" style="padding-top:30px">
+      <div class="stats-metrics">
+        <div class="stats-card"><div class="stats-card-num">{{ stats.metrics.streak_days }}</div><div class="stats-card-lbl">day streak</div></div>
+        <div class="stats-card"><div class="stats-card-num">{{ stats.metrics.hours_this_week }}</div><div class="stats-card-lbl">hours this week</div></div>
+        <div class="stats-card"><div class="stats-card-num">{{ stats.metrics.modules_done }}/{{ stats.metrics.modules_total }}</div><div class="stats-card-lbl">modules done</div></div>
+        <div class="stats-card"><div class="stats-card-num">{{ stats.metrics.projected_finish_label || '—' }}</div><div class="stats-card-lbl">projected finish</div></div>
+      </div>
+
+      <section v-if="stats.stuck_modules && stats.stuck_modules.length" style="margin-bottom:32px">
+        <h3 style="font-size:18px;font-weight:500;margin-bottom:12px">Where you get stuck</h3>
+        <div v-for="sm in stats.stuck_modules" :key="sm.module_id"
+             style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--color-surface);border:1px solid var(--color-neutral-800);border-radius:var(--radius-md);margin-bottom:8px">
+          <span style="font-weight:600;color:var(--color-accent);font-size:13px">{{ sm.code }}</span>
+          <span style="flex:1;font-size:14px">{{ sm.title }}</span>
+          <span class="hp-stuck">stuck {{ sm.stuck_days }} days</span>
+          <span style="font-size:12px;color:var(--color-neutral-500)">Est: {{ sm.est_minutes }} min · Actual: {{ sm.actual_minutes }} min</span>
+        </div>
+      </section>
+
+      <section v-if="stats.insights && stats.insights.length" style="margin-bottom:32px">
+        <h3 style="font-size:18px;font-weight:500;margin-bottom:12px">Agent insights</h3>
+        <div v-for="ins in stats.insights" :key="ins.id"
+             style="padding:14px 16px;background:var(--color-surface);border:1px solid var(--color-neutral-800);border-radius:var(--radius-md);margin-bottom:8px">
+          <div style="font-size:.85rem;margin-bottom:6px">{{ ins.text }}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.75rem;color:var(--color-neutral-500)">{{ ins.ago_label }}</span>
+            <button v-if="ins.action_label" class="btn btn-primary" @click="applyInsight(ins.id)">{{ ins.action_label }}</button>
+          </div>
+        </div>
+      </section>
+
+      <section v-if="stats.heatmap && stats.heatmap.length" style="margin-bottom:32px">
+        <h3 style="font-size:18px;font-weight:500;margin-bottom:8px">Activity</h3>
+        <div style="display:flex;gap:3px;flex-wrap:wrap">
+          <div v-for="h in stats.heatmap" :key="h.date" :title="h.date + ': ' + h.minutes + ' min'"
+               class="heat-cell" :style="{background: heatColor(h.minutes, Math.max(...stats.heatmap.map(x => x.minutes)))}" />
+        </div>
+      </section>
+    </div>
+  </div>`
+};
+
+/* ---- Root app ---------------------------------------------------------- */
+const app = createApp({
+  setup() {
+    const { route } = useRouter();
+    const screens = { home: HomeScreen, build: BuildScreen, roadmap: RoadmapScreen, stats: StatsScreen };
+    const screen = computed(() => screens[route.screen] || screens.home);
+    // Remount the active screen whenever the route target changes so each
+    // screen re-fetches (e.g. switching between two roadmaps, or build → roadmap).
+    const routeKey = computed(() => route.screen + ':' + (route.params.id || route.params.runId || ''));
+    return { screen, params: computed(() => route.params), routeKey };
+  },
+});
+app.mount('#app');
+</script>
+</body>
+</html>

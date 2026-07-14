@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+<template id="__bundler_thumbnail" data-bg-color="#e7e6e2">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#e7e6e2"/>
+    <g stroke="#26251f" stroke-width="10" fill="none" stroke-linecap="round">
+      <path d="M250 400 H430"/>
+      <path d="M600 400 H770 M770 400 V270 M770 270 H930 M770 400 V530 M770 530 H930"/>
+    </g>
+    <g fill="none" stroke-width="10">
+      <rect x="130" y="360" width="120" height="80" rx="10" fill="#eae9e9" stroke="#9b9797"/>
+      <rect x="430" y="360" width="120" height="80" rx="10" fill="#fff" stroke="#ec3013"/>
+      <rect x="930" y="230" width="120" height="80" rx="10" fill="#fff" stroke="#201e1d"/>
+      <rect x="930" y="490" width="120" height="80" rx="10" fill="#fff" stroke="#201e1d"/>
+    </g>
+    <circle cx="490" cy="330" r="16" fill="#ec3013"/>
+  </svg>
+</template>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="assets/themes.scoped.css">
+<link rel="stylesheet" href="assets/roadmap.css">
+<style>
+  body{margin:0;background:#e7e6e2;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+</style>
+</helmet>
+
+<div style="position:absolute;top:26px;left:0;width:5424px;padding:0 4px">
+  <div style="font:700 17px system-ui;color:#26251f;letter-spacing:-.01em">Roadmap Agent — Roadmap view</div>
+  <div style="font:400 13px system-ui;color:#6a6862;margin-top:3px">The signature screen in three visual directions. Same module graph, same content — only the treatment changes. Pan across to compare; tell me which to develop into the full 5-screen flow.</div>
+</div>
+
+<sc-for list="{{frames}}" as="frame" hint-placeholder-count="3">
+<div style="position:absolute;top:96px;left:{{frame.left}}px;width:1728px">
+  <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:11px;padding-left:2px">
+    <span style="font:700 11px ui-monospace,Menlo,monospace;background:#26251f;color:#fff;padding:3px 8px;border-radius:4px">{{frame.badge}}</span>
+    <span style="font:600 13px system-ui;color:#3a382f">{{frame.name}}</span>
+    <span style="font:400 12px system-ui;color:#87857c">{{frame.blurb}}</span>
+  </div>
+
+  <section class="rm-frame {{frame.themeClass}}" style="width:1728px;border:1px solid rgba(0,0,0,.12);box-shadow:0 10px 34px rgba(0,0,0,.13)">
+    <nav class="nav">
+      <span class="nav-brand">Roadmap Agent</span>
+      <a href="#">Today</a>
+      <a href="#" aria-current="page">Roadmap</a>
+      <a href="#">Progress</a>
+      <button class="btn btn-primary">Resume today’s session</button>
+    </nav>
+
+    <div class="rm-stage">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:4px">
+        <div>
+          <h3 style="margin:0 0 3px">Learn Arabic</h3>
+          <div style="font-size:12.5px;opacity:.62">Modern Standard → Levantine · 24 modules · the plan reshapes as you go</div>
+        </div>
+        <div style="text-align:right;font-size:12px;opacity:.62;line-height:1.55">
+          <div>42 days left · 3.5 hrs / week</div>
+          <div>7 of 24 modules complete</div>
+        </div>
+      </div>
+
+      <div class="rm-graphwrap"><div class="rm-graph">
+        <svg class="rm-svg" viewBox="0 0 1680 604" preserveAspectRatio="none" aria-hidden="true">
+          <path class="rm-edge rm-e-locked" d="{{frame.dLocked}}"></path>
+          <path class="rm-edge rm-e-active" d="{{frame.dActive}}"></path>
+          <path class="rm-edge rm-e-stuck" d="{{frame.dStuck}}"></path>
+          <path class="rm-edge rm-e-done" d="{{frame.dDone}}"></path>
+          <path class="rm-lead rm-lead-res" d="M 509 350 L 509 372"></path>
+          <path class="rm-lead rm-lead-split" d="M 929 214 L 1004 208"></path>
+        </svg>
+
+        <sc-for list="{{frame.nodes}}" as="n" hint-placeholder-count="10">
+          <div class="rm-node" data-state="{{n.state}}" style="left:{{n.x}}px;top:{{n.y}}px">
+            <span class="rm-today"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4 H18 L12 19 Z"></path></svg>You are here</span>
+            <div class="rm-top">
+              <span class="rm-lb">{{n.lb}}</span>
+              <span class="rm-ic">
+                <svg class="ic ic-completed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                <svg class="ic ic-inprogress" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5 19 12 8 19Z"></path></svg>
+                <svg class="ic ic-available" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+                <svg class="ic ic-stuck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 22 20H2Z"></path><path d="M12 10v4"></path><path d="M12 17.3h.01"></path></svg>
+                <svg class="ic ic-locked" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h12v10H6z"></path><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+              </span>
+            </div>
+            <span class="rm-ar">{{n.ar}}</span>
+            <span class="rm-mt">{{n.mt}}</span>
+          </div>
+        </sc-for>
+
+        <div class="rm-pop" style="left:300px;top:374px">
+          <div class="rm-pop-k">In progress · today’s target</div>
+          <div class="rm-pop-h">Core 300 Words</div>
+          <div class="rm-pop-s">25 min · session 6 of 10 · resources verified 2 days ago</div>
+          <div class="rm-res">
+            <span class="rm-res-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h11a1 1 0 0 1 1 1v15H7a1 1 0 0 1-1-1Z"></path><path d="M6 4a2 2 0 0 0-2 2v13"></path><path d="M10 4v16"></path></svg></span>
+            <span class="rm-res-b"><div class="rm-res-t">Mastering Arabic 1 — Chapter 4</div><div class="rm-res-m">Textbook · pp. 48–61 · <span class="rm-verif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Verified</span></div></span>
+          </div>
+          <div class="rm-res">
+            <span class="rm-res-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 0 1 13-5l2 2"></path><path d="M20 5v4h-4"></path><path d="M20 13a8 8 0 0 1-13 5l-2-2"></path><path d="M4 19v-4h4"></path></svg></span>
+            <span class="rm-res-b"><div class="rm-res-t">Anki — Core 300 deck, cards 121–160</div><div class="rm-res-m">Spaced repetition · ~15 min</div></span>
+          </div>
+          <div class="rm-res">
+            <span class="rm-res-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6 6 10H3v4h3l5 4Z"></path><path d="M16 9a4 4 0 0 1 0 6"></path></svg></span>
+            <span class="rm-res-b"><div class="rm-res-t">ArabicPod101 — Everyday Nouns</div><div class="rm-res-m">Audio · 9 min · <span class="rm-verif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Verified</span></div></span>
+          </div>
+        </div>
+
+        <div class="rm-split" style="left:980px;top:44px">
+          <div class="rm-split-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 22 20H2Z"></path><path d="M12 10v4"></path><path d="M12 17.3h.01"></path></svg>Plan adapted</div>
+          <div class="rm-split-h">Root &amp; Pattern System — stuck 3 days</div>
+          <div class="rm-split-b">Split into 3 smaller steps and swapped the grammar drills for a gentler resource. Two prerequisite sessions were slotted in before it re-opens.</div>
+          <div class="rm-steps">
+            <div class="rm-step"><span class="rm-step-n">1</span>Recognise 5 common roots by shape</div>
+            <div class="rm-step"><span class="rm-step-n">2</span>One pattern only — فَاعِل (the doer)</div>
+            <div class="rm-step"><span class="rm-step-n">3</span>Map 10 words you already know</div>
+          </div>
+        </div>
+      </div></div>
+
+      <div class="rm-legend">
+        <div class="rm-leg"><span class="rm-sw" data-s="completed"></span>Completed</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="inprogress"></span>In progress · today</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="available"></span>Available</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="stuck"></span>Stuck — replanned</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="locked"></span>Locked</div>
+      </div>
+    </div>
+  </section>
+</div>
+</sc-for>
+
+<div style="position:absolute;top:0;left:5460px;width:1px;height:960px"></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    if (!this._frames) this._frames = this.build();
+    return { frames: this._frames };
+  }
+  build() {
+    const NW = 170, HC = 31;
+    const base = [
+      { id: 'script',  ar: 'الأبجدية',        lb: 'Arabic Script & Sounds',        mt: '12 / 12 sessions',        state: 'completed',  x: 24,   y: 288 },
+      { id: 'read',    ar: 'التشكيل',          lb: 'Reading Voweled Text',          mt: '8 / 8 sessions',          state: 'completed',  x: 224,  y: 288 },
+      { id: 'core',    ar: '٣٠٠ كلمة',         lb: 'Core 300 Words',                mt: 'session 6 of 10',         state: 'inprogress', x: 424,  y: 288 },
+      { id: 'verbs',   ar: 'المضارع',          lb: 'Present-Tense Verbs',           mt: '7 sessions · ready',      state: 'available',  x: 632,  y: 150 },
+      { id: 'nominal', ar: 'الجملة الاسمية',   lb: 'Nominal Sentences',             mt: '5 sessions · ready',      state: 'available',  x: 632,  y: 288 },
+      { id: 'listen',  ar: 'الاستماع',         lb: 'Listening: Slow MSA',           mt: 'ongoing · ready',         state: 'available',  x: 632,  y: 426 },
+      { id: 'root',    ar: 'الجذر والوزن',     lb: 'Root & Pattern System',         mt: 'stuck 3 days',            state: 'stuck',      x: 844,  y: 214 },
+      { id: 'past',    ar: 'الماضي',           lb: 'Past Tense & Narration',        mt: 'needs Root & Pattern',    state: 'locked',     x: 1060, y: 214 },
+      { id: 'levant',  ar: 'اللهجة الشامية',   lb: 'Levantine Dialect Basics',      mt: 'locked',                  state: 'locked',     x: 1272, y: 214 },
+      { id: 'conv',    ar: 'محادثة',           lb: 'Hold a 5-Minute Conversation',  mt: 'capstone · locked',       state: 'locked',     x: 1484, y: 214 }
+    ];
+    const byId = {}; base.forEach(n => { byId[n.id] = n; });
+
+    const edgeDefs = [
+      ['script', 'read', 'done'], ['read', 'core', 'done'],
+      ['core', 'verbs', 'active'], ['core', 'nominal', 'active'], ['core', 'listen', 'active'],
+      ['verbs', 'root', 'stuck'], ['nominal', 'root', 'stuck'],
+      ['root', 'past', 'locked'], ['listen', 'past', 'locked'],
+      ['past', 'levant', 'locked'], ['levant', 'conv', 'locked']
+    ];
+    const elbow = (a, b) => {
+      const x1 = a.x + NW, y1 = a.y + HC, x2 = b.x, y2 = b.y + HC, mx = Math.round((x1 + x2) / 2);
+      return `M ${x1} ${y1} L ${mx} ${y1} L ${mx} ${y2} L ${x2} ${y2}`;
+    };
+    const curve = (a, b) => {
+      const x1 = a.x + NW, y1 = a.y + HC, x2 = b.x, y2 = b.y + HC, dx = x2 - x1;
+      return `M ${x1} ${y1} C ${Math.round(x1 + dx * 0.5)} ${y1}, ${Math.round(x2 - dx * 0.5)} ${y2}, ${x2} ${y2}`;
+    };
+    const combine = (fn, kind) => edgeDefs.filter(e => e[2] === kind)
+      .map(([f, t]) => fn(byId[f], byId[t])).join(' ');
+
+    const frame = (fn, extra) => Object.assign({
+      nodes: base,
+      dDone: combine(fn, 'done'),
+      dActive: combine(fn, 'active'),
+      dStuck: combine(fn, 'stuck'),
+      dLocked: combine(fn, 'locked')
+    }, extra);
+
+    return [
+      frame(elbow, { key: 'modernist',  badge: 'D1', themeClass: 'theme-modernist',  name: 'Modernist',  blurb: 'flat · architectural grid · single red accent · Archivo', left: 0 }),
+      frame(curve, { key: 'broadsheet', badge: 'D2', themeClass: 'theme-broadsheet', name: 'Broadsheet', blurb: 'newsprint serif · whitespace · cyan + magenta spot ink', left: 1848 }),
+      frame(curve, { key: 'nocturne',   badge: 'D3', themeClass: 'theme-nocturne',   name: 'Nocturne',   blurb: 'dark · compact · blurple accent as line + glow', left: 3696 })
+    ];
+  }
+}
+</script>
+</body>
+</html>

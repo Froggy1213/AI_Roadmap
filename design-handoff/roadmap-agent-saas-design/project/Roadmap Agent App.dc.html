@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics="">
+<link rel="stylesheet" href="_ds/nocturne-6a84c381-e48f-4239-a677-1d9775e523f2/styles.css">
+<script src="_ds/nocturne-6a84c381-e48f-4239-a677-1d9775e523f2/_ds_bundle.js"></script>
+<link rel="stylesheet" href="assets/roadmap.css">
+<link rel="stylesheet" href="assets/home.css">
+<link rel="stylesheet" href="assets/app.css">
+<style>
+  body{margin:0}
+</style>
+</helmet>
+
+<div class="theme-nocturne hp-page">
+  <div class="hp-switch" role="group" aria-label="Mockup state">
+    <span class="hp-switch-lb">state</span>
+    <div class="hp-switch-seg">
+      <button class="hp-sw {{emptyOn}}" onClick="{{setEmpty}}">First visit</button>
+      <button class="hp-sw {{workOn}}" onClick="{{setWork}}">Today</button>
+      <button class="hp-sw {{doneOn}}" onClick="{{setDone}}">All done</button>
+      <button class="hp-sw {{mapOn}}" onClick="{{setMap}}">Roadmap</button>
+    </div>
+  </div>
+
+  <sc-if value="{{isEmpty}}" hint-placeholder-val="{{false}}">
+    <header class="hp-header"><div class="hp-main hp-navrow">
+      <span class="hp-brand"><svg class="hp-mark" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round"><circle cx="5" cy="19" r="2.3"></circle><circle cx="19" cy="5" r="2.3"></circle><path d="M6.7 17.3 17.3 6.7"></path></svg>Roadmap Agent</span>
+    </div></header>
+    <div class="hp-empty"><div class="hp-empty-col">
+      <h1>What do you want to learn?</h1>
+      <div class="hp-inrow">
+        <input class="hp-bigin" placeholder="Arabic, from zero to conversation" value="{{query}}" onInput="{{onInput}}" aria-label="What do you want to learn?">
+        <button class="btn btn-primary hp-go" onClick="{{setMap}}">Build my roadmap</button>
+      </div>
+      <div class="hp-chips">
+        <sc-for list="{{chips}}" as="c" hint-placeholder-count="4">
+          <button class="hp-chip" onClick="{{c.onClick}}">{{c.label}}</button>
+        </sc-for>
+      </div>
+      <div class="hp-how">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5"></path><path d="M12 7.6h.01"></path></svg>
+        <span>The agent breaks your topic into a dependency graph of modules, finds real learning resources for each one, and verifies that every link is alive — then paces it to the time you actually have.</span>
+      </div>
+    </div></div>
+  </sc-if>
+
+  <sc-if value="{{isHome}}" hint-placeholder-val="{{true}}">
+    <div class="hp-work"><div class="hp-main">
+      <section class="hp-block">
+        <div class="hp-sechead"><h2>Today</h2><span class="hp-sechead-sub">{{todaySub}}</span></div>
+
+        <sc-if value="{{isWork}}" hint-placeholder-val="{{true}}">
+          <div class="hp-today">
+            <sc-for list="{{tasks}}" as="t" hint-placeholder-count="3">
+              <div class="hp-task">
+                <span class="hp-line" style="background:{{t.color}}"></span>
+                <div class="hp-task-main">
+                  <div class="hp-task-code"><span>{{t.code}}</span><span class="hp-task-route">{{t.route}}</span></div>
+                  <div class="hp-task-title">{{t.title}}</div>
+                </div>
+                <span class="hp-time">{{t.time}}</span>
+                <div class="hp-task-actions">
+                  <button class="btn btn-primary">Start</button>
+                  <button class="btn btn-ghost">Push back</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isDone}}" hint-placeholder-val="{{false}}">
+          <div class="hp-done">
+            <span class="hp-done-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></span>
+            <div class="hp-done-b">
+              <div class="hp-done-t">That’s everything for today. Next session tomorrow</div>
+              <div class="hp-done-s">All three sessions from today’s plan are done. Stop here — the pace holds — or look one module ahead.</div>
+            </div>
+            <button class="btn btn-primary">Pull a module forward</button>
+          </div>
+        </sc-if>
+      </section>
+
+      <section class="hp-block">
+        <div class="hp-sechead"><h2>My roadmaps</h2><span class="hp-sechead-sub">2 active</span></div>
+        <div class="hp-routes">
+          <sc-for list="{{routes}}" as="r" hint-placeholder-count="2">
+            <div class="hp-route" tabIndex="{{r.tab}}" onClick="{{r.onClick}}">
+              <div class="hp-route-top">
+                <span class="hp-route-dot" style="background:{{r.color}}"></span>
+                <span class="hp-route-name">{{r.name}}</span>
+              </div>
+              <div>
+                <div class="hp-route-count"><span>{{r.count}}</span><span>{{r.pctLabel}}</span></div>
+                <div class="hp-bar" style="margin-top:8px"><span class="hp-bar-fill" style="width:{{r.pct}}%;background:{{r.color}}"></span></div>
+              </div>
+              <sc-if value="{{r.stuck}}" hint-placeholder-val="{{false}}">
+                <span class="hp-stuck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 22 20H2Z"></path><path d="M12 10v4"></path><path d="M12 17.3h.01"></path></svg>{{r.stuckText}}</span>
+              </sc-if>
+              <div class="hp-route-foot">
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20v-5"></path><path d="M10 20V9"></path><path d="M16 20V4"></path></svg>{{r.pace}}</span>
+                <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l3 2"></path></svg>{{r.last}}</span>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </div></div>
+  </sc-if>
+
+  <sc-if value="{{isMap}}" hint-placeholder-val="{{false}}">
+    <div class="hp-work"><div class="app-main-wide">
+      <div class="map-head">
+        <div>
+          <h2>Learn Arabic</h2>
+          <div class="map-sub">Modern Standard → Levantine · 24 modules · the plan reshapes as you go</div>
+        </div>
+        <div class="map-meta">
+          <div class="map-stats">
+            <div>42 days left · 3.5 hrs / week</div>
+            <div>7 of 24 modules complete</div>
+          </div>
+          <button class="btn btn-primary" onClick="{{setWork}}">Resume today’s session</button>
+        </div>
+      </div>
+
+      <div class="rm-graphwrap"><div class="rm-graph">
+        <svg class="rm-svg" viewBox="0 0 1680 604" preserveAspectRatio="none" aria-hidden="true">
+          <path class="rm-edge rm-e-locked" d="{{dLocked}}"></path>
+          <path class="rm-edge rm-e-active" d="{{dActive}}"></path>
+          <path class="rm-edge rm-e-stuck" d="{{dStuck}}"></path>
+          <path class="rm-edge rm-e-done" d="{{dDone}}"></path>
+          <path class="rm-lead rm-lead-res" d="M 509 350 L 509 372"></path>
+          <path class="rm-lead rm-lead-split" d="M 929 214 L 1004 208"></path>
+        </svg>
+
+        <sc-for list="{{nodes}}" as="n" hint-placeholder-count="10">
+          <div class="rm-node" data-state="{{n.state}}" style="left:{{n.x}}px;top:{{n.y}}px">
+            <span class="rm-today"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 4 H18 L12 19 Z"></path></svg>You are here</span>
+            <div class="rm-top">
+              <span class="rm-lb">{{n.lb}}</span>
+              <span class="rm-ic">
+                <svg class="ic ic-completed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+                <svg class="ic ic-inprogress" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5 19 12 8 19Z"></path></svg>
+                <svg class="ic ic-available" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>
+                <svg class="ic ic-stuck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 22 20H2Z"></path><path d="M12 10v4"></path><path d="M12 17.3h.01"></path></svg>
+                <svg class="ic ic-locked" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 11h12v10H6z"></path><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+              </span>
+            </div>
+            <span class="rm-ar">{{n.ar}}</span>
+            <span class="rm-mt">{{n.mt}}</span>
+          </div>
+        </sc-for>
+
+        <div class="rm-pop" style="left:300px;top:374px">
+          <div class="rm-pop-k">In progress · today’s target</div>
+          <div class="rm-pop-h">Core 300 Words</div>
+          <div class="rm-pop-s">50 min · session 6 of 10 · resources verified 2 days ago</div>
+          <div class="rm-res">
+            <span class="rm-res-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h11a1 1 0 0 1 1 1v15H7a1 1 0 0 1-1-1Z"></path><path d="M6 4a2 2 0 0 0-2 2v13"></path><path d="M10 4v16"></path></svg></span>
+            <span class="rm-res-b"><div class="rm-res-t">Mastering Arabic 1 — Chapter 4</div><div class="rm-res-m">Textbook · pp. 48–61 · <span class="rm-verif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Verified</span></div></span>
+          </div>
+          <div class="rm-res">
+            <span class="rm-res-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a8 8 0 0 1 13-5l2 2"></path><path d="M20 5v4h-4"></path><path d="M20 13a8 8 0 0 1-13 5l-2-2"></path><path d="M4 19v-4h4"></path></svg></span>
+            <span class="rm-res-b"><div class="rm-res-t">Anki — Core 300 deck, cards 121–160</div><div class="rm-res-m">Spaced repetition · ~15 min</div></span>
+          </div>
+          <div class="rm-res">
+            <span class="rm-res-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6 6 10H3v4h3l5 4Z"></path><path d="M16 9a4 4 0 0 1 0 6"></path></svg></span>
+            <span class="rm-res-b"><div class="rm-res-t">ArabicPod101 — Everyday Nouns</div><div class="rm-res-m">Audio · 9 min · <span class="rm-verif"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>Verified</span></div></span>
+          </div>
+        </div>
+
+        <div class="rm-split" style="left:980px;top:44px">
+          <div class="rm-split-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 22 20H2Z"></path><path d="M12 10v4"></path><path d="M12 17.3h.01"></path></svg>Plan adapted</div>
+          <div class="rm-split-h">Root &amp; Pattern System — stuck 3 days</div>
+          <div class="rm-split-b">Split into 3 smaller steps and swapped the grammar drills for a gentler resource. Two prerequisite sessions were slotted in before it re-opens.</div>
+          <div class="rm-steps">
+            <div class="rm-step"><span class="rm-step-n">1</span>Recognise 5 common roots by shape</div>
+            <div class="rm-step"><span class="rm-step-n">2</span>One pattern only — فَاعِل (the doer)</div>
+            <div class="rm-step"><span class="rm-step-n">3</span>Map 10 words you already know</div>
+          </div>
+        </div>
+      </div></div>
+
+      <div class="rm-legend">
+        <div class="rm-leg"><span class="rm-sw" data-s="completed"></span>Completed</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="inprogress"></span>In progress · today</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="available"></span>Available</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="stuck"></span>Stuck — replanned</div>
+        <div class="rm-leg"><span class="rm-sw" data-s="locked"></span>Locked</div>
+      </div>
+    </div></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1440, &quot;height&quot;: 900}, &quot;view&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;empty&quot;, &quot;today&quot;, &quot;done&quot;, &quot;map&quot;], &quot;default&quot;: &quot;today&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Mockup&quot;}}">
+class Component extends DCLogic {
+  state = { mode: null, query: '' };
+
+  graph() {
+    if (this._g) return this._g;
+    const NW = 170, HC = 31;
+    const base = [
+      { id: 'script',  ar: 'الأبجدية',        lb: 'Arabic Script & Sounds',        mt: '12 / 12 sessions',        state: 'completed',  x: 24,   y: 288 },
+      { id: 'read',    ar: 'التشكيل',          lb: 'Reading Voweled Text',          mt: '8 / 8 sessions',          state: 'completed',  x: 224,  y: 288 },
+      { id: 'core',    ar: '٣٠٠ كلمة',         lb: 'Core 300 Words',                mt: 'session 6 of 10',         state: 'inprogress', x: 424,  y: 288 },
+      { id: 'verbs',   ar: 'المضارع',          lb: 'Present-Tense Verbs',           mt: '7 sessions · ready',      state: 'available',  x: 632,  y: 150 },
+      { id: 'nominal', ar: 'الجملة الاسمية',   lb: 'Nominal Sentences',             mt: '5 sessions · ready',      state: 'available',  x: 632,  y: 288 },
+      { id: 'listen',  ar: 'الاستماع',         lb: 'Listening: Slow MSA',           mt: 'ongoing · ready',         state: 'available',  x: 632,  y: 426 },
+      { id: 'root',    ar: 'الجذر والوزن',     lb: 'Root & Pattern System',         mt: 'stuck 3 days',            state: 'stuck',      x: 844,  y: 214 },
+      { id: 'past',    ar: 'الماضي',           lb: 'Past Tense & Narration',        mt: 'needs Root & Pattern',    state: 'locked',     x: 1060, y: 214 },
+      { id: 'levant',  ar: 'اللهجة الشامية',   lb: 'Levantine Dialect Basics',      mt: 'locked',                  state: 'locked',     x: 1272, y: 214 },
+      { id: 'conv',    ar: 'محادثة',           lb: 'Hold a 5-Minute Conversation',  mt: 'capstone · locked',       state: 'locked',     x: 1484, y: 214 }
+    ];
+    const byId = {}; base.forEach(n => { byId[n.id] = n; });
+    const edgeDefs = [
+      ['script', 'read', 'done'], ['read', 'core', 'done'],
+      ['core', 'verbs', 'active'], ['core', 'nominal', 'active'], ['core', 'listen', 'active'],
+      ['verbs', 'root', 'stuck'], ['nominal', 'root', 'stuck'],
+      ['root', 'past', 'locked'], ['listen', 'past', 'locked'],
+      ['past', 'levant', 'locked'], ['levant', 'conv', 'locked']
+    ];
+    const curve = (a, b) => {
+      const x1 = a.x + NW, y1 = a.y + HC, x2 = b.x, y2 = b.y + HC, dx = x2 - x1;
+      return `M ${x1} ${y1} C ${Math.round(x1 + dx * 0.5)} ${y1}, ${Math.round(x2 - dx * 0.5)} ${y2}, ${x2} ${y2}`;
+    };
+    const combine = (kind) => edgeDefs.filter(e => e[2] === kind)
+      .map(([f, t]) => curve(byId[f], byId[t])).join(' ');
+    this._g = {
+      nodes: base,
+      dDone: combine('done'), dActive: combine('active'),
+      dStuck: combine('stuck'), dLocked: combine('locked')
+    };
+    return this._g;
+  }
+
+  renderVals() {
+    const self = this;
+    const mode = this.state.mode ?? (this.props.view ?? 'today');
+    const set = (m) => (e) => { if (e && e.preventDefault) e.preventDefault(); self.setState({ mode: m }); };
+    const g = this.graph();
+
+    const ACC = 'var(--color-accent)', NEU = 'var(--color-neutral-500)';
+    const routesRaw = [
+      { name: 'Learn Arabic', color: ACC, done: 7, total: 24, pace: 'on pace · 3.5 hrs / week', last: 'last session yesterday', stuck: false, onClick: set('map'), tab: 0 },
+      { name: 'Go for Backend', color: NEU, done: 6, total: 20, pace: 'weekday sessions', last: 'last session 6 days ago', stuck: true, stuckText: 'stuck on a module for 6 days', onClick: () => {}, tab: 0 }
+    ];
+    const routes = routesRaw.map(r => {
+      const pct = Math.round((r.done / r.total) * 100);
+      return Object.assign({}, r, { pct: pct, pctLabel: pct + '%', count: r.done + ' of ' + r.total + ' modules' });
+    });
+    const tasks = [
+      { color: ACC, code: 'AR-09', route: 'Learn Arabic', title: 'Mastering Arabic 1 — Chapter 4, pp. 48–61', time: '25 min' },
+      { color: ACC, code: 'AR-09', route: 'Learn Arabic', title: 'Anki — Core 300 deck, cards 121–160', time: '15 min' },
+      { color: NEU, code: 'GO-07', route: 'Go for Backend', title: 'Goroutines & channels: the basics', time: '30 min' }
+    ];
+    const chipLabels = ['Go for backend', 'Arabic from scratch', 'Sewing: a basic wardrobe', 'Photography fundamentals'];
+    const chips = chipLabels.map(l => ({ label: l, onClick: () => self.setState({ query: l }) }));
+
+    return {
+      isEmpty: mode === 'empty',
+      hasNav: mode !== 'empty',
+      isHome: mode === 'work' || mode === 'done' || mode === 'today',
+      isWork: mode === 'work' || mode === 'today',
+      isDone: mode === 'done',
+      isMap: mode === 'map',
+      emptyOn: mode === 'empty' ? 'hp-sw-on' : '',
+      workOn: (mode === 'work' || mode === 'today') ? 'hp-sw-on' : '',
+      doneOn: mode === 'done' ? 'hp-sw-on' : '',
+      mapOn: mode === 'map' ? 'hp-sw-on' : '',
+      todayCur: mode === 'map' ? 'false' : 'page',
+      mapCur: mode === 'map' ? 'page' : 'false',
+      setEmpty: set('empty'), setWork: set('today'), setDone: set('done'), setMap: set('map'),
+      navToday: set('today'), navMap: set('map'),
+      query: this.state.query,
+      onInput: (e) => self.setState({ query: e.target.value }),
+      todaySub: mode === 'done' ? 'today’s plan is complete' : '3 sessions · about 1 h 10 min',
+      chips: chips, tasks: tasks, routes: routes,
+      nodes: g.nodes, dDone: g.dDone, dActive: g.dActive, dStuck: g.dStuck, dLocked: g.dLocked
+    };
+  }
+}
+</script>
+</body>
+</html>
