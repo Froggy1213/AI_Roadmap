@@ -31,17 +31,32 @@ mocks (`.env.example` shows how to switch to Anthropic / Tavily later).
 Copy `.env.example` to `.env` and fill in your API keys:
 
 ```env
-LLM_PROVIDER=anthropic
-SEARCH_PROVIDER=tavily
+LLM_PROVIDER=gemini          # or: anthropic
+SEARCH_PROVIDER=exa          # or: tavily
+GEMINI_API_KEY=...
 ANTHROPIC_API_KEY=sk-ant-...
 TAVILY_API_KEY=tvly-...
+EXA_API_KEY=...
 ```
 
-Install the optional SDKs:
+Install the optional SDKs (only what you use):
 
 ```bash
-pip install anthropic tavily-python
+pip install google-genai anthropic tavily-python exa-py
 ```
+
+A natural setup is **Gemini as the planner + Exa as the sourcer**: Gemini
+(`LLM_PROVIDER=gemini`) structures the modules and prerequisites, Exa
+(`SEARCH_PROVIDER=exa`) finds real, current links, and `agent/verify.py`
+HTTP-checks each one. The LLM never emits URLs — that separation is enforced in
+the runner.
+
+`SEARCH_PROVIDER=exa` uses [Exa](https://exa.ai) semantic web search — the same
+engine [Agent-Reach](https://github.com/Panniantong/Agent-Reach) uses under the
+hood — to source real, current resources. Results are untyped URLs that
+`agent/verify.py` still HTTP-checks; the kind (video/course/…) is inferred from
+the domain. Adding a provider is just a new `SearchProvider` subclass — the
+runner is unchanged.
 
 ## Architecture
 
@@ -63,8 +78,8 @@ run.py
        │    ├─ insights.py     POST /api/insights/<id>/apply
        │    └─ serializers.py  All response payload builders
        └─ agent/               Agent providers & 5-step runner
-            ├─ llm.py          LLMProvider → MockLLM | AnthropicLLM
-            ├─ search.py       SearchProvider → MockSearch | TavilySearch
+            ├─ llm.py          LLMProvider → MockLLM | AnthropicLLM | GeminiLLM
+            ├─ search.py       SearchProvider → MockSearch | TavilySearch | ExaSearch
             ├─ verify.py       HTTP link verification (HEAD → GET, 5s timeout)
             └─ runner.py       run_generation + run_replan (background threads)
 ```

@@ -223,7 +223,11 @@ body { margin: 0; background: var(--color-bg); }
 .map-meta { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
 .map-stats { text-align: right; font-size: 12.5px; color: var(--color-neutral-500); line-height: 1.6; }
 
-.rm-graphwrap { overflow-x: auto; overflow-y: hidden; padding-bottom: 6px;
+.rm-graphwrap { overflow: auto; padding-bottom: 6px;
+  /* A fixed-height canvas pane: at 100% the whole graph mostly fits; zooming
+     in scrolls inside this box instead of stretching the whole page. */
+  max-height: calc(100vh - 260px); min-height: 360px;
+  overscroll-behavior: contain;
   scrollbar-width: thin; scrollbar-color: var(--color-neutral-700) transparent; }
 .rm-graph { position: relative; margin: 36px 0 0; }
 .rm-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; z-index: 1; }
@@ -330,6 +334,22 @@ body { margin: 0; background: var(--color-bg); }
 .rm-sw[data-s="stuck"] { border: 1px dashed var(--color-accent-400); background: color-mix(in srgb, var(--color-accent) 16%, var(--color-surface)); }
 .rm-sw[data-s="locked"] { border: 1px dashed var(--color-neutral-800); opacity: .6; }
 
+/* zoom controls */
+.rm-zoom { display: flex; align-items: center; gap: 2px; margin-left: auto; }
+.rm-zoom-btn { display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; padding: 0; cursor: pointer;
+  font-family: var(--font-body); font-size: 16px; font-weight: 500; line-height: 1;
+  color: var(--color-neutral-400); background: transparent;
+  border: 1px solid var(--color-neutral-700); border-radius: var(--radius-sm);
+  transition: color .15s, border-color .15s, background .15s; }
+.rm-zoom-btn:hover:not(:disabled) { color: var(--color-text); border-color: var(--color-neutral-500); }
+.rm-zoom-btn:disabled { opacity: .35; cursor: not-allowed; }
+.rm-zoom-lbl { display: inline-flex; align-items: center; justify-content: center;
+  min-width: 40px; height: 28px; padding: 0 6px;
+  font-size: 11.5px; font-weight: 500; color: var(--color-neutral-400);
+  cursor: pointer; border-radius: var(--radius-sm); transition: color .15s, background .15s; }
+.rm-zoom-lbl:hover { color: var(--color-text); background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+
 /* ---- stats screen ----------------------------------------------------- */
 .stats-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 32px; }
 .stats-card { display: flex; flex-direction: column; align-items: center; gap: 4px;
@@ -386,7 +406,7 @@ body { margin: 0; background: var(--color-bg); }
 </script>
 
 <script type="module">
-import { createApp, ref, computed, onMounted, onUnmounted, reactive } from 'vue';
+import { createApp, ref, computed, onMounted, onUnmounted, reactive, nextTick } from 'vue';
 
 /* ---- hash router ------------------------------------------------------ */
 function useRouter() {
@@ -672,6 +692,49 @@ const RoadmapScreen = {
   setup(props) {
     const data = ref(null), selected = ref(null), loading = ref(true), inprog = ref(null), busy = ref(false);
 
+    /* ---- zoom ------------------------------------------------------- */
+    const zoom = ref(1);
+    const wrapEl = ref(null);
+    const ZOOM_MIN = 0.3, ZOOM_MAX = 2.5, ZOOM_STEP = 0.15;
+    const clampZoom = (z) => Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, +z.toFixed(2)));
+    const zoomLabel = computed(() => Math.round(zoom.value * 100) + '%');
+    // The CSS `zoom` property scales the graph *and* its scroll footprint in
+    // one coordinate space, so nodes, edges and popovers stay aligned and the
+    // scrollbars stay correct. (Using both width*z and transform:scale double-
+    // scaled the SVG edges but not the absolute-positioned nodes — the drift.)
+    const graphStyle = computed(() => {
+      const w = (data.value && data.value.canvas && data.value.canvas.width) || 1680;
+      return { width: w + 'px', height: graphHeight.value + 'px', zoom: zoom.value };
+    });
+
+    // Zoom toward a client point (default: the pane centre) by keeping the
+    // content under that point fixed while the scroll footprint grows/shrinks.
+    function setZoom(target, cx, cy) {
+      const z1 = clampZoom(target), z0 = zoom.value;
+      const el = wrapEl.value;
+      if (z1 === z0 || !el) { zoom.value = z1; return; }
+      const rect = el.getBoundingClientRect();
+      const ax = cx == null ? rect.width / 2 : cx - rect.left;
+      const ay = cy == null ? rect.height / 2 : cy - rect.top;
+      const contentX = el.scrollLeft + ax, contentY = el.scrollTop + ay;
+      const ratio = z1 / z0;
+      zoom.value = z1;
+      nextTick(() => {
+        el.scrollLeft = contentX * ratio - ax;
+        el.scrollTop = contentY * ratio - ay;
+      });
+    }
+    function zoomIn()   { setZoom(zoom.value + ZOOM_STEP); }
+    function zoomOut()  { setZoom(zoom.value - ZOOM_STEP); }
+    function zoomReset(){ setZoom(1); }
+    // Ctrl/⌘ + wheel zooms toward the cursor; a plain wheel still scrolls.
+    // Bound via @wheel in the template so it attaches once the graph renders.
+    function onGraphWheel(e) {
+      if (!e.ctrlKey && !e.metaKey) return;
+      e.preventDefault();
+      setZoom(zoom.value - Math.sign(e.deltaY) * ZOOM_STEP, e.clientX, e.clientY);
+    }
+
     async function load() {
       try {
         data.value = await api('/api/roadmaps/' + props.params.id);
@@ -726,9 +789,10 @@ const RoadmapScreen = {
 
     const edgeClass = (s) => 'rm-edge rm-e-' + s;
 
-    return { data, selected, loading, inprog, busy, graphHeight, popStyle, leadPath,
+    return { data, selected, loading, inprog, busy, graphHeight, graphStyle, popStyle, leadPath,
              selectModule, closeOverlay, edgePath, edgeClass,
-             completeModuleSessions, markStuck, kindIcon, ICONS };
+             completeModuleSessions, markStuck, kindIcon,
+             zoom, zoomIn, zoomOut, zoomReset, zoomLabel, onGraphWheel, wrapEl, ICONS };
   },
   template: /*html*/`
   <div class="hp-page">
@@ -756,9 +820,9 @@ const RoadmapScreen = {
         </div>
       </div>
 
-      <div class="rm-graphwrap">
-        <div class="rm-graph" :style="{width: ((data.canvas && data.canvas.width) || 1680) + 'px', height: graphHeight + 'px'}">
-          <svg class="rm-svg" :viewBox="'0 0 ' + ((data.canvas && data.canvas.width) || 1680) + ' ' + graphHeight" preserveAspectRatio="none" aria-hidden="true">
+      <div class="rm-graphwrap" ref="wrapEl" @wheel="onGraphWheel">
+        <div class="rm-graph" :style="graphStyle">
+          <svg class="rm-svg" :viewBox="'0 0 ' + ((data.canvas && data.canvas.width) || 1680) + ' ' + graphHeight" preserveAspectRatio="none" aria-hidden="true" :style="{overflow:'visible'}">
             <path v-for="e in data.edges" :key="e.from + '-' + e.to"
                   :class="edgeClass(e.style)" :d="edgePath(e)" />
             <path v-if="inprog" class="rm-lead rm-lead-res" :d="leadPath(inprog)" />
@@ -815,6 +879,11 @@ const RoadmapScreen = {
         <div class="rm-leg"><span class="rm-sw" data-s="available"></span>Available</div>
         <div class="rm-leg"><span class="rm-sw" data-s="stuck"></span>Stuck — replanned</div>
         <div class="rm-leg"><span class="rm-sw" data-s="locked"></span>Locked</div>
+        <div class="rm-zoom">
+          <button class="rm-zoom-btn" @click="zoomOut" :disabled="zoom <= 0.3" title="Zoom out (Ctrl+scroll)">−</button>
+          <span class="rm-zoom-lbl" @click="zoomReset" title="Reset zoom">{{ zoomLabel }}</span>
+          <button class="rm-zoom-btn" @click="zoomIn" :disabled="zoom >= 2.5" title="Zoom in (Ctrl+scroll)">+</button>
+        </div>
       </div>
     </div>
 

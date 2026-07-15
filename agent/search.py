@@ -9,6 +9,7 @@ from __future__ import annotations
 import os
 import random
 from abc import ABC, abstractmethod
+from urllib.parse import urlsplit
 
 
 class SearchProvider(ABC):
@@ -142,6 +143,40 @@ class MockSearch(SearchProvider):
 
 
 # ---------------------------------------------------------------------------
+# Result kind classification
+# ---------------------------------------------------------------------------
+# Real search engines (Exa, Tavily) return untyped URLs. The UI groups
+# resources by kind (video / course / audio / book / practice / article), so
+# we infer the kind from the result's domain and fall back to "article".
+
+_KIND_BY_DOMAIN = {
+    "youtube.com": "video", "youtu.be": "video", "vimeo.com": "video",
+    "coursera.org": "course", "udemy.com": "course", "edx.org": "course",
+    "khanacademy.org": "course", "udacity.com": "course", "futurelearn.com": "course",
+    "podcasts.apple.com": "audio", "soundcloud.com": "audio", "overcast.fm": "audio",
+    "openlibrary.org": "book", "goodreads.com": "book", "oreilly.com": "book",
+    "manning.com": "book",
+    "github.com": "practice", "gitlab.com": "practice", "leetcode.com": "practice",
+    "exercism.org": "practice", "kaggle.com": "practice", "codewars.com": "practice",
+    "hackerrank.com": "practice", "replit.com": "practice",
+}
+
+
+def _host(url: str) -> str:
+    host = urlsplit(url).netloc.lower()
+    return host[4:] if host.startswith("www.") else host
+
+
+def classify_kind(url: str) -> str:
+    """Map a result URL onto one of the app's resource kinds."""
+    host = _host(url)
+    for domain, kind in _KIND_BY_DOMAIN.items():
+        if host == domain or host.endswith("." + domain):
+            return kind
+    return "article"
+
+
+# ---------------------------------------------------------------------------
 # Tavily Search
 # ---------------------------------------------------------------------------
 
@@ -164,11 +199,53 @@ class TavilySearch(SearchProvider):
         response = client.search(query=query, max_results=n, search_depth="basic")
         results: list[dict] = []
         for r in response.get("results", [])[:n]:
+            url = r.get("url", "")
             results.append({
                 "title": r.get("title", ""),
-                "url": r.get("url", ""),
+                "url": url,
                 "snippet": r.get("content", ""),
-                "kind": "article",  # Tavily doesn't classify — default to article
+                "kind": classify_kind(url),
+            })
+        return results
+
+
+# ---------------------------------------------------------------------------
+# Exa Search — semantic web search (the engine Agent-Reach uses under the hood)
+# ---------------------------------------------------------------------------
+
+class ExaSearch(SearchProvider):
+    """Semantic web search via Exa (https://exa.ai). Requires `pip install
+    exa-py` and EXA_API_KEY. Returns live URLs for real, current learning
+    resources; those URLs then pass through agent/verify.py's HTTP check like
+    any other provider — no changes to the runner needed."""
+
+    def __init__(self, api_key: str | None = None):
+        self._api_key = api_key or os.environ.get("EXA_API_KEY", "")
+
+    def search(self, query: str, n: int = 5) -> list[dict]:
+        try:
+            from exa_py import Exa
+        except ImportError:
+            raise RuntimeError(
+                "exa-py package is required for ExaSearch. "
+                "Install it with: pip install exa-py"
+            )
+        if not self._api_key:
+            raise RuntimeError("EXA_API_KEY is not set — cannot use ExaSearch.")
+
+        client = Exa(api_key=self._api_key)
+        # type="auto" lets Exa pick neural vs keyword search per query.
+        response = client.search(query, num_results=n, type="auto")
+        results: list[dict] = []
+        for r in getattr(response, "results", []) or []:
+            url = getattr(r, "url", "") or ""
+            if not url:
+                continue
+            results.append({
+                "title": getattr(r, "title", None) or url,
+                "url": url,
+                "snippet": "",
+                "kind": classify_kind(url),
             })
         return results
 
@@ -182,5 +259,7 @@ def get_search() -> SearchProvider:
     provider = os.environ.get("SEARCH_PROVIDER", "mock").lower()
     if provider == "tavily":
         return TavilySearch()
+    if provider == "exa":
+        return ExaSearch()
     # Default: mock
     return MockSearch()

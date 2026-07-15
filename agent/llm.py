@@ -319,6 +319,48 @@ class AnthropicLLM(LLMProvider):
 
 
 # ---------------------------------------------------------------------------
+# Gemini LLM
+# ---------------------------------------------------------------------------
+
+class GeminiLLM(LLMProvider):
+    """Calls Google's Gemini API — the "brain" that plans the roadmap. Requires
+    `pip install google-genai` and GEMINI_API_KEY. Gemini structures the modules
+    and prerequisites; it never produces URLs — those come only from the search
+    provider and pass agent/verify.py's HTTP check."""
+
+    def __init__(self, api_key: str | None = None, model: str | None = None):
+        self._api_key = api_key or os.environ.get("GEMINI_API_KEY", "")
+        self._model = model or os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+
+    def generate(self, prompt: str, system: str | None = None) -> str:
+        try:
+            from google import genai
+            from google.genai import types
+        except ImportError:
+            raise RuntimeError(
+                "google-genai package is required for GeminiLLM. "
+                "Install it with: pip install google-genai"
+            )
+        if not self._api_key:
+            raise RuntimeError("GEMINI_API_KEY is not set — cannot use GeminiLLM.")
+
+        client = genai.Client(api_key=self._api_key)
+        config = types.GenerateContentConfig(
+            # Ask Gemini for raw JSON so the planning steps parse cleanly.
+            response_mime_type="application/json",
+            system_instruction=system or None,
+        )
+        response = client.models.generate_content(
+            model=self._model, contents=prompt, config=config
+        )
+        return response.text or ""
+
+    def generate_json(self, prompt: str, system: str | None = None) -> dict:
+        json_system = (system or "") + "\nRespond ONLY with valid JSON. No markdown fences, no explanation."
+        return super().generate_json(prompt, json_system)
+
+
+# ---------------------------------------------------------------------------
 # Factory
 # ---------------------------------------------------------------------------
 
@@ -327,5 +369,7 @@ def get_llm() -> LLMProvider:
     provider = os.environ.get("LLM_PROVIDER", "mock").lower()
     if provider == "anthropic":
         return AnthropicLLM()
+    if provider == "gemini":
+        return GeminiLLM()
     # Default: mock
     return MockLLM()
