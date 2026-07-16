@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.git/
+.gitignore
+.DS_Store
+.pytest_cache/
+instance/
+.env
+CLAUDE.md
+design-handoff/

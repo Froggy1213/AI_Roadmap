@@ -9,6 +9,8 @@ dark theme from the design bundle in `design-handoff/`.
 
 ## Run
 
+### Local
+
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
@@ -21,6 +23,30 @@ Re-seed from scratch any time:
 
 ```bash
 flask --app run seed
+```
+
+### Docker
+
+```bash
+# Build the image
+docker build -t roadmap-agent .
+
+# Run (demo data auto-seeded on first start)
+docker run -p 5000:5000 roadmap-agent
+
+# Persist the SQLite database across container restarts
+docker run -p 5000:5000 -v $(pwd)/data:/app/instance roadmap-agent
+
+# With real providers
+docker run -p 5000:5000 \
+  -e LLM_PROVIDER=gemini \
+  -e SEARCH_PROVIDER=exa \
+  -e GEMINI_API_KEY=... \
+  -e EXA_API_KEY=... \
+  roadmap-agent
+
+# Re-seed demo data inside a running container
+docker exec <container-id> flask --app run seed
 ```
 
 No API keys and no internet are required: LLM and search providers default to
