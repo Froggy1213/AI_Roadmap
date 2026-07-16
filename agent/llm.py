@@ -331,6 +331,7 @@ class GeminiLLM(LLMProvider):
     def __init__(self, api_key: str | None = None, model: str | None = None):
         self._api_key = api_key or os.environ.get("GEMINI_API_KEY", "")
         self._model = model or os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+        self._max_retries = 3
 
     def generate(self, prompt: str, system: str | None = None) -> str:
         try:
@@ -344,16 +345,40 @@ class GeminiLLM(LLMProvider):
         if not self._api_key:
             raise RuntimeError("GEMINI_API_KEY is not set — cannot use GeminiLLM.")
 
+        import time
+
         client = genai.Client(api_key=self._api_key)
         config = types.GenerateContentConfig(
             # Ask Gemini for raw JSON so the planning steps parse cleanly.
             response_mime_type="application/json",
             system_instruction=system or None,
         )
-        response = client.models.generate_content(
-            model=self._model, contents=prompt, config=config
+
+        last_exc = None
+        for attempt in range(self._max_retries):
+            try:
+                response = client.models.generate_content(
+                    model=self._model, contents=prompt, config=config
+                )
+                return response.text or ""
+            except Exception as exc:
+                last_exc = exc
+                # 429 RESOURCE_EXHAUSTED — wait and retry with backoff
+                if not self._is_retryable(exc):
+                    raise
+                delay = min(2 ** attempt, 30)
+                time.sleep(delay)
+
+        raise last_exc  # type: ignore[misc]
+
+    @staticmethod
+    def _is_retryable(exc: Exception) -> bool:
+        """Return True for 429 quota errors that should be retried."""
+        msg = str(exc).lower()
+        return any(
+            keyword in msg
+            for keyword in ("429", "resource_exhausted", "quota", "rate")
         )
-        return response.text or ""
 
     def generate_json(self, prompt: str, system: str | None = None) -> dict:
         json_system = (system or "") + "\nRespond ONLY with valid JSON. No markdown fences, no explanation."

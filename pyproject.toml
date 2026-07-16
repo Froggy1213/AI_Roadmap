@@ -1,0 +1,27 @@
+[project]
+name = "roadmap-agent"
+version = "1.0.0"
+description = "An agent that turns 'I want to learn X' into a dependency graph of modules"
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.0",
+    "sqlalchemy>=2.0",
+    "python-dotenv>=1.0",
+    "requests>=2.31",
+]
+
+[project.optional-dependencies]
+llm = [
+    "anthropic>=0.39.0",
+    "google-genai>=1.0.0",
+]
+search = [
+    "tavily-python>=0.5.0",
+    "exa-py>=1.0.0",
+]
+test = [
+    "pytest>=8.0",
+]
+prod = [
+    "gunicorn>=22.0",
+]
